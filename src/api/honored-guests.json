@@ -1,0 +1,49 @@
+{
+  "guests": [
+    {
+      "name": "Tara",
+      "role": "Maid of Honor",
+      "photo": "/images/honored-guests/bridesmaids/Tara.jpeg"
+    },
+    {
+      "name": "David",
+      "role": "Best Man",
+      "photo": "/images/honored-guests/groomsmen/David.png"
+    },
+    {
+      "name": "Lina",
+      "role": "Bridesmaid",
+      "photo": "/images/honored-guests/bridesmaids/Lina.jpeg"
+    },
+    {
+      "name": "Misha",
+      "role": "Bridesmaid",
+      "photo": "/images/honored-guests/bridesmaids/Misha.jpeg"
+    },
+    {
+      "name": "Jay",
+      "role": "Groomsman",
+      "photo": "/images/honored-guests/groomsmen/Jay.jpeg"
+    },
+    {
+      "name": "Charlene",
+      "role": "Bridesmaid",
+      "photo": "/images/honored-guests/bridesmaids/Charlene.jpeg"
+    },
+    {
+      "name": "Nicole",
+      "role": "Bridesmaid",
+      "photo": "/images/honored-guests/bridesmaids/Nicole.jpeg"
+    },
+    {
+      "name": "Matt",
+      "role": "Groomsman",
+      "photo": "/images/honored-guests/groomsmen/Matt.png"
+    },
+    {
+      "name": "Gaby",
+      "role": "Bridesmaid",
+      "photo": "/images/honored-guests/bridesmaids/Gaby.PNG"
+    }
+  ]
+}

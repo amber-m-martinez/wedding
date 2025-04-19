@@ -1,0 +1,44 @@
+{
+  "faq": [
+    {
+      "question": "What time should I arrive for the wedding?",
+      "answer": "Please arrive by 5pm to ensure there aren't any interruptions during the ceremony that begins prompty at 5:30pm. New York City traffic can be unpredictable, so plan accordingly. Check the <a href='/events' style='text-decoration: underline;'>Events</a> page for directions to the Boathouse."
+    },
+    {
+      "question": "What do I wear?",
+      "answer": "The attire is black-tie optional: tuxedos are welcome but not required. Suits with ties, long dresses & gowns, and upscale pantsuits are perfect. Please avoid white. <b>The floor is herringbone brick, so thinner heels might be tricky.</b> \n\nExamples and optional color palette of the attire can be found on the <a href='/attire' style='text-decoration: underline;'>Attire</a> page."
+    },
+    {
+      "question": "What will the weather be like?",
+      "answer": "In late October, Brooklyn’s evening temperatures typically range from the mid-to-low 60s, with evenings cooling to around 50°F. A light jacket is recommended for the night!"
+    },
+    {
+      "question": "Is there a hotel room block?",
+      "answer": "Yes! Please view the <a href='https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink' style='text-decoration: underline;'>room block link here</a>."
+    },
+    {
+      "question": "What's the phone and photo policy?",
+      "answer": "We kindly ask that you keep your phones away and refrain from taking photos during the ceremony. Feel free to use your phone during cocktail hour and the reception!"
+    },
+    {
+      "question": "When should I RSVP by?",
+      "answer": "In late October, Brooklyn’s evening temperatures typically range from the mid-to-low 60s, with evenings cooling to around 50°F. A light jacket is recommended for the night!"
+    },
+    {
+      "question": "Can I bring a plus one?",
+      "answer": "It will be indicated on your RSVP if you have a plus one. Please reach out if you have any questions!"
+    },
+    {
+      "question": "Can I bring my children?",
+      "answer": "To ensure a relaxed and enjoyable celebration for everyone, we kindly ask that only the children that we have specifically invited attend. The amount of invited children is less than a handful. We appreciate your understanding!"
+    },
+    {
+      "question": "Is there an open bar?",
+      "answer": "There is an open bar! 🥂"
+    },
+    {
+      "question": "How should I address the couple?",
+      "answer": "The Lynns ♡"
+    }
+  ]
+}

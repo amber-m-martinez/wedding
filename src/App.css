@@ -1,0 +1,453 @@
+.app {
+  font-family: "Cormorant Infant", serif;
+  /* font-family: "EB Garamond", serif; */
+  color: #5f5f5f;
+  background-size: 100% auto;
+  background-position: center 10%;
+  background-repeat: no-repeat;
+  background-color: white;
+  max-width: 100%;
+  min-height: 100vh;
+  font-weight: 400;
+}
+
+.page-container {
+  margin: 0px auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  font-size: 45px;
+  user-select: none;
+}
+
+a {
+  color: #5f5f5f;
+  text-decoration: none;
+  transition: text-shadow 0.15s ease, color 0.15s ease;
+  display: inline-block;
+}
+
+a:hover {
+  cursor: pointer !important;
+  color: #8a1a25;
+  text-shadow: 0 0 0.4px #8a1a25, 0 0 0.4px #8a1a25;
+}
+
+button {
+  display: block;
+  margin-top: 30px;
+  border-radius: 4px;
+  border: 1px solid #5f5f5f;
+  background-color: transparent;
+}
+
+.button-link {
+  color: #5f5f5f;
+}
+
+.button-link:hover {
+  cursor: pointer !important;
+  color: #8a1a25;
+}
+
+.navBarContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding: 30px 20px;
+  margin: 0px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.navBarContainer > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+  gap: 20px 40px;
+  margin-top: 15px;
+}
+
+.navOptions {
+  padding: 0 15px;
+  font-size: 18px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.section-container {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin-bottom: 40px;
+}
+
+.section-inner {
+  display: flex;
+  width: 920px;
+  align-items: flex-start;
+}
+
+.section-image {
+  width: 500px;
+  height: 333.28px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.section-content {
+  margin-left: 100px;
+}
+
+.section-content img {
+  height: 35px;
+  margin-bottom: 7px;
+}
+
+.section-title {
+  font-family: "EB Garamond", serif;
+  font-size: 25px;
+}
+
+.section-subtitle {
+  font-size: 19px;
+  margin-top: -16px;
+}
+
+.section-time {
+  font-size: 20px;
+  font-weight: 550;
+  margin-top: -5px;
+}
+
+.section-detail {
+  font-size: 20px;
+  margin-top: -17px;
+}
+
+.section-paragraph {
+  font-size: 20px;
+  margin-top: 0;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background-color: transparent;
+  color: #8a1a25;
+  text-align: center;
+  font-size: 15.5px;
+  border-radius: 6px;
+  padding: 6px 8px;
+  position: absolute;
+  z-index: 20;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+  user-select: none;
+}
+
+.disabled-link {
+  pointer-events: none;
+  color: rgb(171, 170, 170);
+  cursor: not-allowed;
+  text-decoration: none;
+  user-select: none;
+}
+
+.masonry-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.my-masonry-grid {
+  display: flex;
+  margin-left: 0px;
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  padding-left: 16px;
+  background-clip: padding-box;
+}
+
+.tile-img {
+  width: 100%;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navBottomBorder {
+  display: none;
+}
+
+.inspo-header {
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid rgb(171, 170, 170);
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+}
+
+.responsive-align {
+  text-align: left;
+}
+
+.faqList {
+  max-width: 1000px;
+  margin-left: 0px;
+  margin-right: 0px;
+  width: 100%;
+}
+
+.eventName {
+  margin-bottom: 20px;
+  font-size: 25px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.homePhoto {
+  height: 220px;
+  width: auto;
+}
+
+.headerText {
+  color: #8a1a25;
+  font-family: "Cedarville Cursive", cursive;
+  font-size: 45px;
+  user-select: none;
+}
+
+.dottedBorder {
+  border-bottom: thin dotted #5f5f5fe2;
+  margin-bottom: 40px;
+}
+
+.attire-container {
+  max-width: 975px;
+  margin: 0 auto;
+  padding: 0px 20px;
+}
+
+.travelContainer {
+  max-width: 990px;
+  width: 100%;
+}
+
+.hotelCards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: -25px;
+  margin-bottom: -25px;
+}
+
+.button-link.honeymoon {
+  font-size: 25px;
+  margin: 0;
+  padding: 10px;
+  font-weight: 550;
+}
+
+.button-link.honeymoon:hover {
+  color: rgb(66, 61, 61);
+}
+
+.love-story-title {
+  font-family: "Cedarville cursive";
+  font-size: 35px;
+}
+
+.section-content.love-story {
+  margin-left: 0;
+  max-width: 400px;
+  flex: 1 1 300px;
+  text-align: left;
+}
+
+@media (max-width: 990px) {
+  .responsive-align {
+    text-align: center;
+  }
+  .faqList {
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+  .travelContainer {
+    padding: 0 35px;
+  }
+  .hotelCards {
+    justify-content: center;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  a:hover {
+    text-shadow: none;
+  }
+
+  .homePhoto {
+    height: 170px;
+    width: auto;
+    margin-top: -10px;
+  }
+
+  button {
+    width: 78vw;
+  }
+
+  .button-link.honeymoon {
+    font-size: 21.2px;
+  }
+
+  .travelContainer {
+    padding: 0 35px;
+  }
+
+  .attire-container {
+    margin: 0 35px;
+  }
+
+  .dottedBorder {
+    display: none;
+  }
+
+  .headerText {
+    font-size: 38px;
+  }
+
+  .header {
+    margin-bottom: -2px;
+  }
+
+  .navOptions {
+    font-size: 17px;
+    padding: 4px 12px;
+  }
+
+  .navOptionsContainer {
+    display: flex;
+    margin-top: -10px;
+  }
+
+  .navBottomBorder {
+    width: 100%;
+    display: inline-block;
+    padding-bottom: 15px;
+    border-bottom: 0.6px solid #7b4046;
+  }
+
+  .navBarContainer {
+    margin-bottom: 0px;
+  }
+
+  .navBarContainer > div:last-child {
+    gap: 15px 20px;
+  }
+
+  .section-inner {
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .section-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+    margin: 10px 0px;
+  }
+
+  .section-content {
+    margin: 20px 0 0 0;
+    width: 100%;
+    text-align: center;
+    padding: 0 10px;
+  }
+
+  .section-content.love-story {
+    margin-top: -70px;
+  }
+
+  .section-content img {
+    margin: 0 auto 10px;
+    display: block;
+  }
+
+  .section-title,
+  .section-subtitle,
+  .section-time,
+  .section-detail,
+  .section-paragraph {
+    text-align: center;
+  }
+
+  .page-container {
+    margin: 0 35px;
+  }
+}
+
+.eventName {
+  font-size: 25px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.desktop-only {
+  text-align: left;
+  font-size: 25px;
+}
+.mobile-only {
+  display: none;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only {
+    display: inline-block;
+  }
+}
+
+@media (max-width: 600px) {
+  .homePhoto {
+    width: 90vw;
+    height: auto;
+  }
+}

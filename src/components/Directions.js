@@ -1,25 +1,17 @@
 import React from "react";
 import "yet-another-react-lightbox/styles.css";
 import ExpandableImage from "./ExpandableImage";
-// import "yet-another-react-lightbox/plugins/zoom/styles.css";
 
 function Directions() {
   return (
     <div className="section-container">
       <div className="section-inner">
-        {/* <img
-          src="/images/boathouse-event-map.png"
-          alt="prospect park boathouse"
-          className="section-image"
-        /> */}
-
         <ExpandableImage
           src="/images/boathouse-event-map.png"
           alt="prospect park boathouse"
           className="section-image"
         />
         <div className="section-content">
-          {/* <img src="/images/swans1.png" alt="swans" /> */}
           <p className="section-title">Directions</p>
           <p className="section-subtitle">
             <a

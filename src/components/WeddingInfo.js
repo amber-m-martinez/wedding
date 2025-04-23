@@ -11,13 +11,17 @@ function WeddingInfo() {
           loading="eager"
         />
         <div className="section-content">
-          <img src="/images/swans1.png" alt="swans" />
+          <img
+            style={{ height: 50 }}
+            src="/images/swan-monogram-thin-grey.png"
+            alt="swans"
+          />
           <p className="section-title">Prospect Park Boathouse</p>
           <p className="section-paragraph" style={{ marginTop: -3 }}>
             <a href="/attire">Attire: Black-tie optional.</a>
           </p>
           <p className="section-time">5:00pm</p>
-          <p class="section-subtitle" style={{ fontSize: 15 }}>
+          <p className="section-subtitle" style={{ fontSize: 15 }}>
             Arrive by 5pm, the ceremony begins at 5:30pm.
           </p>
           <p className="section-detail">Ceremony by the Lullwater</p>

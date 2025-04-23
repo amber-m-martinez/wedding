@@ -4,26 +4,28 @@ import { motion } from "framer-motion";
 function Travel() {
   const hotels = [
     {
+      name: "Ace Hotel Brooklyn",
+      address: "252 Schermerhorn St <br> Brooklyn, NY 11217",
+      image: "/images/hotels/ace-hotel.jpg",
+      link: "https://reservations.acehotel.com/?&hotel=30176&arrive=2025-10-23&depart=2025-10-25&group=MALY1025",
+      blockText: "Room block link",
+      extraText: "Room block is bookable until Sept. 8th",
+    },
+    {
       name: "Aloft New York Brooklyn",
       address: "216 Duffield St <br/> Brooklyn, NY 11201",
-      image: "/images/aloft.jpeg",
+      image: "/images/hotels/aloft-hotel.png",
       link: "https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink",
       blockText: "Room block link",
-      extraText: "*Room block is bookable until Sept. 11th",
+      extraText: "Room block is bookable until Sept. 11th",
     },
     {
       name: "EVEN Hotel Brooklyn",
       address: "46 Nevins St <br/> Brooklyn, NY 11217",
-      image:
-        "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/97/1b/80/even-hotel-brooklyn-an.jpg?w=1400&h=-1&s=1",
-      link: "https://www.ihg.com/evenhotels/hotels/us/en/brooklyn/bxyev/hoteldetail",
-    },
-    {
-      name: "Hampton Inn Brooklyn",
-      address: "125 Flatbush Avenue Extension <br/> Brooklyn, NY, 11201",
-      image:
-        "https://images.trvl-media.com/lodging/9000000/8030000/8026900/8026859/7fc06626.jpg?impolicy=resizecrop&rw=1200&ra=fit",
-      link: "https://www.hilton.com/en/hotels/nycbohx-hampton-brooklyn-downtown/",
+      image: "/images/hotels/even-hotel.jpg",
+      link: "add link pls",
+      blockText: "Room block link",
+      extraText: "Room block is bookable until Sept. 23rd",
     },
   ];
 
@@ -42,9 +44,7 @@ function Travel() {
         alignItems: "center",
       }}
     >
-      {/* Content wrapper to align title and hotel cards */}
       <div className="travelContainer">
-        {/* Nearby Hotels Title */}
         <div style={{ marginBottom: 40 }}>
           <p
             className="responsive-align"
@@ -55,15 +55,14 @@ function Travel() {
               fontWeight: 1000,
             }}
           >
-            Nearby hotels
+            Hotel Room Blocks
           </p>
           <p className="responsive-align" style={{ fontSize: 19 }}>
-            We have a room block at the Brooklyn Aloft and have recommended some
-            other nearby hotels.
+            We have room blocks at the following hotels between October
+            23rd-25th.
           </p>
         </div>
 
-        {/* Hotel Cards */}
         <div className="hotelCards">
           {hotels.map((hotel, index) => (
             <div
@@ -75,19 +74,19 @@ function Travel() {
                 textAlign: "center",
               }}
             >
-              {/* <img
-                src={hotel.image}
-                alt={hotel.name}
-                style={{
-                  width: 290,
-                  height: 200,
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  borderRadius: 4,
-                  filter: "grayscale(10%)",
-                }}
-              /> */}
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 20 }}>
+                <img
+                  alt="hotel"
+                  src={hotel.image}
+                  style={{
+                    width: 250,
+                    height: 170,
+                    objectFit: "cover",
+                    borderRadius: 4,
+                    marginBottom: 20,
+                    border: "0.3px solid #e0e0e0",
+                  }}
+                ></img>
                 <p className="section-title">
                   <a
                     target="_blank"
@@ -118,13 +117,12 @@ function Travel() {
                         style={{
                           textDecoration: "underline",
                           fontWeight: 500,
-                          // color: "#7b4046",
                         }}
                       >
                         {hotel.blockText}
                       </a>
                     </p>
-                    <p style={{ marginTop: -12 }}>{hotel.extraText}</p>
+                    <p>{hotel.extraText}</p>
                   </div>
                 )}
               </div>
@@ -132,7 +130,6 @@ function Travel() {
           ))}
         </div>
 
-        {/* Recommended Food */}
         <div style={{ marginTop: 60 }}>
           <div style={{ marginBottom: 40 }}>
             <p
@@ -147,7 +144,7 @@ function Travel() {
               Recommended food
             </p>
             <p className="responsive-align" style={{ fontSize: 19 }}>
-              Some of our favorite restaurants and food spots nearby.
+              Some of our favorite restaurants and food spots in the city.
             </p>
           </div>
           <div>
@@ -159,7 +156,6 @@ function Travel() {
           </div>
         </div>
 
-        {/* Recommended Bars */}
         <div style={{ marginTop: 60 }}>
           <div style={{ marginBottom: 40 }}>
             <p
@@ -174,7 +170,7 @@ function Travel() {
               Recommended bars
             </p>
             <p className="responsive-align" style={{ fontSize: 19 }}>
-              Some of our favorite restaurants and food spots nearby.
+              Some of our favorite bars in the city.
             </p>
           </div>
           <div>

@@ -12,7 +12,11 @@ function WelcomeParty() {
           style={{ objectFit: "cover", objectPosition: "center 65%" }}
         />
         <div className="section-content">
-          <img src="/images/swans1.png" alt="swans" />
+          <img
+            style={{ height: 50 }}
+            src="/images/swan-monogram-thin-grey.png"
+            alt="swans"
+          />
           <p className="section-title">Clover Club</p>
           <p className="section-subtitle">
             <a
@@ -25,7 +29,7 @@ function WelcomeParty() {
           </p>
 
           <p className="section-paragraph" style={{ marginTop: -3 }}>
-            <a href="/attire">Attire: Smart casual.</a>
+            <a href="/attire">Attire: Smart Casual.</a>
           </p>
           <p className="section-time">6-8pm</p>
           <p className="section-detail">Drinks and mingling</p>

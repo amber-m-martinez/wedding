@@ -35,7 +35,7 @@ function Home() {
 
         <div
           style={{
-            marginTop: 48,
+            marginTop: 20,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -45,12 +45,9 @@ function Home() {
           }}
         >
           <img
-            src="/images/swan-monogram.png"
+            src="/images/swan-monogram-thin-grey.png"
             alt="swans"
-            style={{
-              height: 60,
-              marginBottom: 23,
-            }}
+            className="swan-home"
           />
           <p
             style={{

@@ -7,13 +7,13 @@ import { Routes, Route } from "react-router-dom";
 import HonoredGuests from "./components/honored-guests/HonoredGuests";
 import Gifts from "./components/Gifts";
 import RSVP from "./components/RSVP";
-import Attire from "./components/Attire";
+import Attire from "./components/attire/Attire";
 import FAQs from "./components/FAQS/FAQs";
 import "./App.css";
 
 function App() {
   return (
-    <div class="app">
+    <div className="app">
       <Navigation></Navigation>
       <Routes>
         <Route exact path="/" element={<Home />}></Route>

@@ -28,8 +28,6 @@ function GuestCard({ data }) {
         }}
       >
         <Card.Body>
-          {/*                 color: "#742935", */}
-          {/* header */}
           <div style={{ textAlign: "center" }}>
             <Card.Title
               style={{

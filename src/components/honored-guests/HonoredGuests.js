@@ -47,9 +47,9 @@ function HonoredGuests() {
           style={{
             marginTop: 50,
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", // This creates a responsive grid layout
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
             gap: 20,
-            justifyItems: "center", // Ensure each grid item (GuestCard) is centered
+            justifyItems: "center",
             maxWidth: 1500,
             marginLeft: "auto",
             marginRight: "auto",

@@ -4,14 +4,16 @@ import { motion } from "framer-motion";
 function LoveStory() {
   return (
     <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh + 3100px)",
-        width: "100vw",
+        minHeight: "100vh",
         overflow: "hidden",
       }}
     >
       <div className="page-container">
-        {/* ORIGINAL SECTION */}
         <div
           className="section-container"
           style={{ maxWidth: 880, width: "100%" }}
@@ -36,7 +38,6 @@ function LoveStory() {
           </div>
         </div>
 
-        {/* REVERSED (PHOTO RIGHT, TEXT LEFT) */}
         <div
           className="section-container"
           style={{
@@ -64,7 +65,7 @@ function LoveStory() {
               style={{ width: 300, marginTop: 28, maxWidth: "100%" }}
             />
             <div className="section-content love-story">
-              <p class="love-story-title">March 6th, 2025</p>
+              <p className="love-story-title">March 6th, 2021</p>
               <p
                 style={{
                   fontSize: 20,
@@ -119,7 +120,7 @@ function LoveStory() {
               style={{ width: 380, marginTop: 28, maxWidth: "100%" }}
             />
             <div className="section-content love-story">
-              <p class="love-story-title">Our first year</p>
+              <p className="love-story-title">Our first year</p>
               <p
                 style={{
                   fontSize: 20,

@@ -5,6 +5,14 @@
       "answer": "Please arrive by 5pm to ensure there aren't any interruptions during the ceremony that begins prompty at 5:30pm. New York City traffic can be unpredictable, so plan accordingly. Check the <a href='/events' style='text-decoration: underline;'>Events</a> page for directions to the Boathouse."
     },
     {
+      "question": "When should I RSVP by?",
+      "answer": "Please RSVP by September 17th, 2025."
+    },
+    {
+      "question": "Is there a hotel room block?",
+      "answer": "Yes! Please view the <a href='https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink' style='text-decoration: underline;'>room block link here</a>."
+    },
+    {
       "question": "What do I wear?",
       "answer": "The attire is black-tie optional: tuxedos are welcome but not required. Suits with ties, long dresses & gowns, and upscale pantsuits are perfect. Please avoid white. <b>The floor is herringbone brick, so thinner heels might be tricky.</b> \n\nExamples and optional color palette of the attire can be found on the <a href='/attire' style='text-decoration: underline;'>Attire</a> page."
     },
@@ -13,16 +21,8 @@
       "answer": "In late October, Brooklyn’s evening temperatures typically range from the mid-to-low 60s, with evenings cooling to around 50°F. A light jacket is recommended for the night!"
     },
     {
-      "question": "Is there a hotel room block?",
-      "answer": "Yes! Please view the <a href='https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink' style='text-decoration: underline;'>room block link here</a>."
-    },
-    {
       "question": "What's the phone and photo policy?",
       "answer": "We kindly ask that you keep your phones away and refrain from taking photos during the ceremony. Feel free to use your phone during cocktail hour and the reception!"
-    },
-    {
-      "question": "When should I RSVP by?",
-      "answer": "In late October, Brooklyn’s evening temperatures typically range from the mid-to-low 60s, with evenings cooling to around 50°F. A light jacket is recommended for the night!"
     },
     {
       "question": "Can I bring a plus one?",

@@ -9,7 +9,7 @@ const ExpandableImage = ({ src, alt, className = "" }) => {
       style={{
         position: "relative",
         display: "inline-block",
-        cursor: "pointer", // Make the entire div clickable
+        cursor: "pointer",
       }}
     >
       <Zoom overlayBgColorEnd="rgba(255, 255, 255, 0.4)" zoomMargin={40}>
@@ -18,12 +18,11 @@ const ExpandableImage = ({ src, alt, className = "" }) => {
           alt={alt}
           className={className}
           style={{
-            cursor: "pointer", // Ensure image also has pointer cursor
+            cursor: "pointer",
           }}
         />
       </Zoom>
 
-      {/* Zoom icon overlay */}
       <div
         style={{
           position: "absolute",
@@ -36,7 +35,7 @@ const ExpandableImage = ({ src, alt, className = "" }) => {
           alignItems: "center",
           justifyContent: "center",
           boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-          pointerEvents: "none", // makes sure clicks go through to image
+          pointerEvents: "none",
         }}
       >
         <FaExpandAlt size={16} color="#333" />

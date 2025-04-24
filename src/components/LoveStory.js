@@ -185,8 +185,8 @@ function LoveStory() {
                 <br />
                 It was cloudy and rainy all day until we got to the park that
                 afternoon. Stephen suggested they take a photo together, then
-                dropped down on one knee. The sun was shining and we poured
-                their hearts out to each other.
+                dropped down on one knee. The sun was shining and we poured our
+                hearts out to each other.
                 <br />
                 <br />
                 That night, we celebrated at Cotogna, an Italian restaurant in

@@ -6,11 +6,11 @@
     },
     {
       "question": "When should I RSVP by?",
-      "answer": "Please RSVP by September 17th, 2025."
+      "answer": "Please RSVP by Wednesday, September 17th, 2025."
     },
     {
       "question": "Is there a hotel room block?",
-      "answer": "Yes! Please view the <a href='https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink' style='text-decoration: underline;'>room block link here</a>."
+      "answer": "Yes! We have 3 room block options. Each guest is responsible for their respective guest room(s). Please view the room blocks on the <a href='/travel' style='text-decoration: underline;'>Travel</a> page."
     },
     {
       "question": "What do I wear?",
@@ -33,12 +33,8 @@
       "answer": "To ensure a relaxed and enjoyable celebration for everyone, we kindly ask that only the children that we have specifically invited attend. The amount of invited children is less than a handful. We appreciate your understanding!"
     },
     {
-      "question": "Is there an open bar?",
-      "answer": "There is an open bar! 🥂"
-    },
-    {
-      "question": "How should I address the couple?",
-      "answer": "The Lynns ♡"
+      "question": "What food and drink will be provided?",
+      "answer": "At the wedding, there is a cocktail hour with hors d'oeuvres and a plated dinner. There is an open bar at both the wedding and the welcome drinks event. 🥂 You will select your entree for the wedding reception when you RSVP. Please let us know if you have any dietary restrictions."
     }
   ]
 }

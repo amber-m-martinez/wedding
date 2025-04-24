@@ -13,7 +13,7 @@ function HonoredGuests() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh)",
+        minHeight: "100vh",
         width: "100vw",
         backgroundSize: "100% auto",
         backgroundPosition: "center 10%",

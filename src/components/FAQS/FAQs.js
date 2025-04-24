@@ -13,7 +13,8 @@ function FAQs() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh + 400px)",
+        minHeight: "100vh",
+        marginBottom: 30,
         width: "100vw",
         display: "flex",
         justifyContent: "center",

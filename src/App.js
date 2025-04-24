@@ -1,20 +1,21 @@
 import Home from "./components/Home";
 import LoveStory from "./components/LoveStory";
-import Navigation from "./components/Nav";
+import Nav from "./components/Nav";
 import Travel from "./components/Travel";
 import Events from "./components/Events";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import HonoredGuests from "./components/honored-guests/HonoredGuests";
 import Gifts from "./components/Gifts";
-import RSVP from "./components/RSVP";
+// import RSVP from "./components/RSVP";
 import Attire from "./components/attire/Attire";
 import FAQs from "./components/FAQS/FAQs";
 import "./App.css";
+// import Footer from "./components/Footer";
 
 function App() {
   return (
     <div className="app">
-      <Navigation></Navigation>
+      <Nav></Nav>
       <Routes>
         <Route exact path="/" element={<Home />}></Route>
         <Route exact path="/travel" element={<Travel />}></Route>
@@ -24,8 +25,10 @@ function App() {
         <Route exact path="/honored-guests" element={<HonoredGuests />}></Route>
         <Route exact path="/gifts" element={<Gifts />}></Route>
         <Route exact path="/FAQ" element={<FAQs />}></Route>
-        <Route exact path="/rsvp" element={<RSVP />}></Route>
+        {/* <Route exact path="/rsvp" element={<RSVP />}></Route> */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {/* <Footer></Footer> */}
     </div>
   );
 }

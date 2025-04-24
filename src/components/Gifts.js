@@ -9,7 +9,7 @@ function Gifts() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh)",
+        height: "65vh",
         width: "100vw",
       }}
     >

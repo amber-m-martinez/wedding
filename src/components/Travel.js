@@ -36,12 +36,13 @@ function Travel() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh + 200px)",
+        minHeight: "100vh",
         width: "100%",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        marginBottom: 30,
       }}
     >
       <div className="travelContainer">

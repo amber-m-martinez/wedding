@@ -8,7 +8,6 @@
   max-width: 100%;
   min-height: 100vh;
   font-weight: 400;
-  margin-bottom: 50px;
 }
 
 .page-container {
@@ -64,6 +63,18 @@ button {
   margin: 0px;
   text-align: center;
   margin-bottom: 15px;
+}
+
+.footerContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+  margin-top: 60px;
+}
+
+.footerText {
+  display: flex;
+  position: relative;
 }
 
 .navBarContainer > div:last-child {
@@ -223,6 +234,7 @@ button {
   margin-left: 0px;
   margin-right: 0px;
   width: 100%;
+  margin-bottom: 0;
 }
 
 .eventName {
@@ -322,9 +334,7 @@ button {
   .attire-container {
     margin: 0 35px;
   }
-}
 
-@media (max-width: 768px) {
   a:hover {
     text-shadow: none;
   }
@@ -426,6 +436,12 @@ button {
 
   .section-content.love-story {
     margin-top: -70px;
+    text-align: center;
+    padding: 0;
+  }
+
+  .section-inner.love-story {
+    padding: 0;
   }
 
   .section-content img {

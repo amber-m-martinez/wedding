@@ -12,9 +12,10 @@ function Events() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh + 10px)",
+        minHeight: "100vh",
         width: "100vw",
         overflow: "hidden",
+        marginBottom: 50,
       }}
     >
       <div className="page-container">

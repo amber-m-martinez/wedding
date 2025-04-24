@@ -9,7 +9,7 @@ function RSVP() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "calc(100vh + 400px)",
+        minHeight: "100vh",
         width: "100vw",
       }}
     ></motion.div>

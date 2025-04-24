@@ -31,7 +31,7 @@ function WelcomeParty() {
           <p className="section-paragraph" style={{ marginTop: -3 }}>
             <a href="/attire">Attire: Smart Casual.</a>
           </p>
-          <p className="section-time">6-8pm</p>
+          <p className="section-time">5-7pm</p>
           <p className="section-detail">Drinks and mingling</p>
         </div>
       </div>

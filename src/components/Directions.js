@@ -25,7 +25,7 @@ function Directions() {
           <p className="section-paragraph">
             Please view the directions on this map, including the Uber/Lyft
             drop&#8209;off point and the pedestrian-only paths. You won't be
-            able to drive directly up to the Boathouse. Staff from the boathouse
+            able to drive directly up to the Boathouse. Staff from the Boathouse
             will be directing guests to the venue.
           </p>
           <p className="section-paragraph">

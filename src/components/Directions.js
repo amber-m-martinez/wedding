@@ -9,7 +9,7 @@ function Directions() {
         <ExpandableImage
           src="/images/boathouse-event-map.png"
           alt="prospect park boathouse"
-          className="section-image"
+          className="section-image directions"
         />
         <div className="section-content">
           <p className="section-title">Directions</p>
@@ -23,7 +23,10 @@ function Directions() {
             </a>
           </p>
           <p className="section-paragraph">
-            Staff from the boathouse will be directing guests to the venue.
+            Please view the directions on this map, including the Uber/Lyft
+            drop&#8209;off point and the pedestrian-only paths. You won't be
+            able to drive directly up to the Boathouse. Staff from the boathouse
+            will be directing guests to the venue.
           </p>
           <p className="section-paragraph">
             Parking is available along Willink Drive as shown on the map, but

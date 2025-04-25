@@ -5,7 +5,8 @@ function Travel() {
   const hotels = [
     {
       name: "Ace Hotel Brooklyn",
-      address: "252 Schermerhorn St <br> Brooklyn, NY 11217",
+      address:
+        "<a target='_blank' noopener noreferrer href='https://maps.app.goo.gl/A5pCJ5E8H6W8dDra8'>252 Schermerhorn St <br> Brooklyn, NY 11217</a>",
       image: "/images/hotels/ace-hotel.jpg",
       link: "https://reservations.acehotel.com/?&hotel=30176&arrive=2025-10-23&depart=2025-10-25&group=MALY1025",
       blockText: "Room block link",
@@ -13,7 +14,8 @@ function Travel() {
     },
     {
       name: "Aloft New York Brooklyn",
-      address: "216 Duffield St <br/> Brooklyn, NY 11201",
+      address:
+        "<a target='_blank' noopener noreferrer href='https://maps.app.goo.gl/wbe2ZL1eSqNrNwA26'>216 Duffield St <br/> Brooklyn, NY 11201</a>",
       image: "/images/hotels/aloft-hotel.png",
       link: "https://www.marriott.com/event-reservations/reservation-link.mi?id=1740687509912&key=GRP&guestreslink2=true&app=resvlink",
       blockText: "Room block link",
@@ -21,7 +23,8 @@ function Travel() {
     },
     {
       name: "EVEN Hotel Brooklyn",
-      address: "46 Nevins St <br/> Brooklyn, NY 11217",
+      address:
+        "<a target='_blank' noopener noreferrer href='https://maps.app.goo.gl/w8C7bwHMQbkJQMD36'>46 Nevins St <br/> Brooklyn, NY 11217</a>",
       image: "/images/hotels/even-hotel.jpg",
       link: "add link pls",
       blockText: "Room block link",

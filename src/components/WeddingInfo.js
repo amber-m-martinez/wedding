@@ -17,6 +17,7 @@ function WeddingInfo() {
             alt="swans"
           />
           <p className="section-title">Prospect Park Boathouse</p>
+
           <p className="section-paragraph" style={{ marginTop: -3 }}>
             <a href="/attire">Attire: Black-tie optional.</a>
           </p>
@@ -24,9 +25,11 @@ function WeddingInfo() {
           <p className="section-subtitle" style={{ fontSize: 15 }}>
             Arrive by 5pm, the ceremony begins at 5:30pm.
           </p>
-          <p className="section-detail">Ceremony by the Lullwater</p>
+          <p className="section-detail">Ceremony outside by the Lullwater</p>
           <p className="section-time">6pm</p>
-          <p className="section-detail">Drinks on the terrace</p>
+          <p className="section-detail">
+            Drinks & hors d'oeuvres on the terrace
+          </p>
           <p className="section-time">7pm</p>
           <p className="section-detail">Dinner inside the boathouse</p>
         </div>

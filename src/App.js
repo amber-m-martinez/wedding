@@ -10,6 +10,7 @@ import Gifts from "./components/Gifts";
 import Attire from "./components/attire/Attire";
 import FAQs from "./components/FAQS/FAQs";
 import "./App.css";
+import BridalParty from "./components/BridalParty";
 // import Footer from "./components/Footer";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route exact path="/gifts" element={<Gifts />}></Route>
         <Route exact path="/FAQ" element={<FAQs />}></Route>
         {/* <Route exact path="/rsvp" element={<RSVP />}></Route> */}
+        <Route exact path="/bridal-party" element={<BridalParty />}></Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {/* <Footer></Footer> */}

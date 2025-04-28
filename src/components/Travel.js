@@ -26,7 +26,7 @@ function Travel() {
       address:
         "<a target='_blank' noopener noreferrer href='https://maps.app.goo.gl/w8C7bwHMQbkJQMD36'>46 Nevins St <br/> Brooklyn, NY 11217</a>",
       image: "/images/hotels/even-hotel.jpg",
-      link: "add link pls",
+      link: "https://www.ihg.com/redirect?path=asearch&brandCode=6C&localeCode=en&regionCode=1&hotelCode=BXYEV&checkInDate=23&checkInMonthYear=092025&checkOutDate=25&checkOutMonthYear=092025&rateCode=6CBARC&_PMID=99801505&GPC=MGL&cn=no&viewfullsite=true",
       blockText: "Room block link",
       extraText: "Room block is bookable until Sept. 23rd",
     },

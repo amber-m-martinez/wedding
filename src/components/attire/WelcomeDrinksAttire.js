@@ -3,29 +3,29 @@ import Masonry from "react-masonry-css";
 
 function WelcomeDrinksAttire() {
   const womensAttire = [
-    "/images/womens-attire/welcome-drinks/women-drinks-1.jpg",
-    "/images/womens-attire/welcome-drinks/women-drinks-2.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-3.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-9.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-7.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-8.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-4.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-6.jpeg",
-    "/images/womens-attire/welcome-drinks/women-drinks-10.png",
-    "/images/womens-attire/welcome-drinks/women-drinks-11.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-14.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-19.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-23.png",
+    "/images/womens-attire/welcome-drinks/women-drinks-15.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-25.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-16.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-25.jpg",
+    "/images/womens-attire/welcome-drinks/women-drinks-28.png",
+    "/images/womens-attire/welcome-drinks/women-drinks-31.jpeg",
+    "/images/womens-attire/welcome-drinks/women-drinks-32.png",
   ];
 
   const mensAttire = [
-    "/images/mens-attire/welcome-drinks/men-drinks-10.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-7.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-2.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-1.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-4.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-11.png",
-    "/images/mens-attire/welcome-drinks/men-drinks-8.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-15.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-17.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-16.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-19.jpeg",
     "/images/mens-attire/welcome-drinks/men-drinks-9.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-8.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-18.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-20.jpeg",
     "/images/mens-attire/welcome-drinks/men-drinks-5.jpeg",
-    "/images/mens-attire/welcome-drinks/men-drinks-14.jpeg",
+    "/images/mens-attire/welcome-drinks/men-drinks-21.jpeg",
   ];
 
   const breakpointColumnsObj = {
@@ -52,14 +52,17 @@ function WelcomeDrinksAttire() {
           className="responsive-align"
           style={{ fontSize: 25, fontWeight: 700 }}
         >
-          Welcome Drinks: Smart Casual
+          Welcome Drinks: Elevated Smart Casual
         </p>
         <p
           className="responsive-align"
           style={{ fontSize: 18, marginTop: -10 }}
         >
-          The attire for welcome drinks is smart casual. Show us your style! You
-          may see examples/inspiration for the attire below.
+          The welcome drinks attire is Elevated Smart Casual. Dressy but
+          relaxed! Think trousers or chinos with a nice shirt or sweater, and
+          stylish dresses, skirts, or polished pants. Jackets and ties are not
+          required. Please no jeans or athletic shoes. <br />
+          You may see examples/inspiration for the attire below.
         </p>
       </div>
       <div

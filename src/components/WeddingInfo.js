@@ -18,8 +18,8 @@ function WeddingInfo() {
           />
           <p className="section-title">Prospect Park Boathouse</p>
 
-          <p className="section-paragraph" style={{ marginTop: -3 }}>
-            <a href="/attire">Attire: Black-tie optional</a>
+          <p className="section-detail">
+            <a href="/attire">Attire: Black-Tie Optional</a>
           </p>
           <p className="section-time">5:00pm</p>
           <p className="section-subtitle" style={{ fontSize: 15 }}>

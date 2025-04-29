@@ -57,8 +57,12 @@ function WeddingDayAttire() {
           className="responsive-align"
           style={{ fontSize: 18, marginTop: -10 }}
         >
-          The attire for the wedding ceremony and reception is black-tie
-          optional. You may see examples/inspiration for the attire below.
+          The attire for the wedding ceremony and reception is Black-Tie
+          Optional. Suits with ties, long dresses & gowns, and upscale pantsuits
+          are perfect. Please avoid white. The flooring is herringbone brick, so
+          thinner heels might be tricky.
+          <br />
+          You may see examples/inspiration for the attire below.
         </p>
       </div>
       <div

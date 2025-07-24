@@ -45,6 +45,7 @@ function GuestsAttending({
     ],
     "Juliana Martinez": ["Julian Martinez", "Josh Martinez"],
     "Lina Martinez": ["Valentina Suarez"],
+    "Isabella Martinez": ["Hieu Tran"],
     "Stephanie Gensheimer": [
       "Steve Gensheimer",
       "Claire Gensheimer",

@@ -171,7 +171,13 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                       Wedding Day Selections
                     </h6>
                     {guest.mealPreferences.entree && (
-                      <p style={{ fontSize: 16, fontWeight: 500 }}>
+                      <p
+                        style={{
+                          fontSize: 16,
+                          fontWeight: 500,
+                          marginBottom: 5,
+                        }}
+                      >
                         Entree: {guest.mealPreferences.entree}
                       </p>
                     )}
@@ -187,7 +193,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                   <h6 style={{ fontWeight: 700, fontSize: 17 }}>
                     Dietary Information
                   </h6>
-                  <p style={{ fontSize: 16, fontWeight: 500 }}>
+                  <p style={{ fontSize: 16, fontWeight: 500, marginBottom: 5 }}>
                     Dietary Restrictions:{" "}
                     {guest.mealPreferences.dietaryRestrictions || "None"}
                   </p>

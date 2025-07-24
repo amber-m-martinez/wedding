@@ -43,11 +43,7 @@ function RSVP() {
       )}
       {step === "Meal preferences" && (
         <MealPreferences
-          // guestList={guestList}
           setStep={setStep}
-          // step={step}
-          // guestSelected={guestSelected}
-          // setGuestSelected={setGuestSelected}
           guestRSVP={guestRSVP}
           setGuestRSVP={setGuestRSVP}
         />

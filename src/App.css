@@ -44,6 +44,33 @@ button {
   background-color: transparent;
 }
 
+.attendance-button {
+  padding: 0px 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  height: 35px;
+}
+
+.attendance-button.attending {
+  background-color: #ddecde;
+  color: rgba(16, 16, 16, 0.699);
+}
+
+.attendance-button.not-attending {
+  background-color: #f8eaea;
+  color: rgba(16, 16, 16, 0.699);
+}
+
+.attendance-button.default {
+  background-color: #f4f4f4;
+}
+
+/* Only apply pink hover to default (unselected) buttons
+.attendance-button.default:hover {
+  background-color: white;
+} */
+
 .button-link {
   color: #5f5f5f;
 }
@@ -51,6 +78,49 @@ button {
 .button-link:hover {
   cursor: pointer !important;
   color: #e88faa;
+}
+
+input {
+  border: transparent;
+  border-bottom: #5f5f5f solid 0.9px;
+  border-radius: 2px;
+  color: #5f5f5f;
+  font-weight: 500px;
+}
+
+input::placeholder {
+  color: #979797;
+  opacity: 1;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+  outline: none;
+}
+
+input[type="radio"]:hover {
+  accent-color: #f099b2 !important; /* Accent color on hover */
+}
+
+input[type="checkbox"]:hover {
+  accent-color: #f099b2 !important; /* Accent color on hover */
+}
+
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  /* your other styles */
+}
+
+.dropdown:hover {
+  color: #e88faa;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
 }
 
 .navBarContainer {
@@ -182,14 +252,6 @@ button {
 .tooltip-wrapper:hover .tooltip-text {
   visibility: visible;
   opacity: 1;
-  user-select: none;
-}
-
-.disabled-link {
-  pointer-events: none;
-  color: rgb(171, 170, 170);
-  cursor: not-allowed;
-  text-decoration: none;
   user-select: none;
 }
 
@@ -490,4 +552,90 @@ button {
   .mobile-only {
     display: inline-block;
   }
+}
+
+@media (min-width: 768px) {
+  .guest-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+.select-meal-button {
+  font-size: 19px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  color: #888;
+  cursor: not-allowed;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+  font-weight: 600;
+}
+
+.confirmRSVPbutton {
+  font-size: 19px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  cursor: not-allowed;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+  font-weight: 600;
+  background-color: #fbfbfb;
+  color: #5f5f5f;
+  cursor: pointer;
+}
+
+.select-meal-button.enabled {
+  background-color: #fbfbfb;
+  color: #5f5f5f;
+  cursor: pointer;
+}
+
+.select-meal-button.enabled:hover {
+  color: #e88faa;
+}
+
+.backButton {
+  font-size: 19px;
+  padding: 5px 9px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+  font-weight: 600;
+  background-color: #fbfbfb;
+  color: #5f5f5f;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  color: #e88faa;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-wrapper .select-meal-button[disabled]::after {
+  content: "Please respond for every guest to continue.";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  white-space: nowrap;
+  font-size: 15.6px;
+  z-index: 10;
+  color: #5f5f5f;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+}
+
+.tooltip-wrapper .select-meal-button[disabled]:hover::after {
+  opacity: 1;
+  visibility: visible;
 }

@@ -29,18 +29,9 @@ function Nav() {
         <a href="/gifts" className="navOptions">
           Registry
         </a>
-        <div className="tooltip-wrapper">
-          <a
-            href="/"
-            className="navOptions disabled-link"
-            onClick={(e) => e.preventDefault()}
-          >
-            RSVP
-          </a>
-          <span className="tooltip-text">
-            RSVP will open around end of July
-          </span>
-        </div>
+        <a href="/rsvp" className="navOptions">
+          RSVP
+        </a>
         <div className="navBottomBorder"></div>
       </div>
     </div>

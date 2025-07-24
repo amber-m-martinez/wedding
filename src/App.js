@@ -6,12 +6,11 @@ import Events from "./components/Events";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HonoredGuests from "./components/honored-guests/HonoredGuests";
 import Gifts from "./components/Gifts";
-// import RSVP from "./components/RSVP";
+import RSVP from "./components/RSVP/RSVP";
 import Attire from "./components/attire/Attire";
 import FAQs from "./components/FAQS/FAQs";
 import "./App.css";
 import BridalParty from "./components/BridalParty";
-// import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -26,7 +25,7 @@ function App() {
         <Route exact path="/honored-guests" element={<HonoredGuests />}></Route>
         <Route exact path="/gifts" element={<Gifts />}></Route>
         <Route exact path="/FAQ" element={<FAQs />}></Route>
-        {/* <Route exact path="/rsvp" element={<RSVP />}></Route> */}
+        <Route exact path="/rsvp" element={<RSVP />}></Route>
         <Route exact path="/bridal-party" element={<BridalParty />}></Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

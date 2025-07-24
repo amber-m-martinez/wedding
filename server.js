@@ -45,6 +45,24 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
+async function testAuth() {
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
+
+    const client = await auth.getClient();
+    const token = await client.getAccessToken();
+    console.log("Access token:", token.token);
+    console.log("Authentication succeeded!");
+  } catch (err) {
+    console.error("Authentication error:", err);
+  }
+}
+
+testAuth();
+
 const sheets = google.sheets({ version: "v4", auth });
 
 const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";

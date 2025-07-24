@@ -6,28 +6,44 @@ const path = require("path");
 
 const app = express();
 
-// ✅ Mobile-safe CORS options
+// CORS setup: allow your frontend domains
+const allowedOrigins = [
+  "https://amberandstephen.info",
+  "http://localhost:3000",
+];
+
 const corsOptions = {
-  origin: ["https://amberandstephen.info", "http://localhost:3000"],
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["POST"],
   credentials: true,
 };
+
 app.use(cors(corsOptions));
-app.options("/api/submit-rsvp", cors(corsOptions)); // 🧪 allow preflight
+app.options("/api/submit-rsvp", cors(corsOptions)); // enable preflight for this route
 
 app.use(express.json());
 
-// 🔐 Google Sheets Auth
+// Google Sheets Auth setup
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "amber-stephen-wedding-027345281640.json"),
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
 const sheets = google.sheets({ version: "v4", auth });
+
 const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";
 const RANGE = "RSVPs!A:J";
 
-// ✅ RSVP submission endpoint
+// RSVP POST endpoint
 app.post("/api/submit-rsvp", async (req, res) => {
   try {
     const rsvpData = req.body;

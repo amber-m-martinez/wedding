@@ -1,13 +1,23 @@
+// server.js or index.js
 const express = require("express");
 const { google } = require("googleapis");
 const cors = require("cors");
 const path = require("path");
 
 const app = express();
-app.use(cors());
+
+// ✅ Mobile-safe CORS options
+const corsOptions = {
+  origin: ["https://amberandstephen.info", "http://localhost:3000"],
+  methods: ["POST"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.options("/api/submit-rsvp", cors(corsOptions)); // 🧪 allow preflight
+
 app.use(express.json());
 
-// Google Sheets Auth
+// 🔐 Google Sheets Auth
 const auth = new google.auth.GoogleAuth({
   keyFile: path.join(__dirname, "amber-stephen-wedding-027345281640.json"),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
@@ -15,8 +25,9 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: "v4", auth });
 const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";
-const RANGE = "RSVPs!A:J"; // Adjust if you have more columns
+const RANGE = "RSVPs!A:J";
 
+// ✅ RSVP submission endpoint
 app.post("/api/submit-rsvp", async (req, res) => {
   try {
     const rsvpData = req.body;
@@ -43,9 +54,7 @@ app.post("/api/submit-rsvp", async (req, res) => {
       spreadsheetId: SPREADSHEET_ID,
       range: RANGE,
       valueInputOption: "RAW",
-      requestBody: {
-        values: rows,
-      },
+      requestBody: { values: rows },
     });
 
     console.log("RSVP data submitted:", response.data);
@@ -61,7 +70,7 @@ app.post("/api/submit-rsvp", async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`RSVP server running on port ${PORT}`);
+  console.log(`✅ RSVP server running on port ${PORT}`);
 });
 
 module.exports = app;

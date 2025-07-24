@@ -71,16 +71,12 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL || ""}/api/submit-rsvp`,
-        {
-          method: "POST",
-          body: JSON.stringify(rsvpData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const apiUrl = process.env.REACT_APP_API_URL || "";
+      const response = await fetch(`${apiUrl}/api/submit-rsvp`, {
+        method: "POST",
+        body: JSON.stringify(rsvpData),
+        headers: { "Content-Type": "application/json" },
+      });
 
       const result = await response.json();
 
@@ -91,7 +87,11 @@ function ConfirmationPage({ setStep, guestRSVP }) {
       }
     } catch (error) {
       console.error("Submission error:", error);
-      alert("Error submitting RSVP. Please check your connection.");
+      alert(
+        `Error submitting RSVP. Please check your connection. ${
+          error.message
+        }, ${process.env.REACT_APP_API_URL || ""}/api/submit-rsvp`
+      );
     } finally {
       setIsSubmitting(false);
     }

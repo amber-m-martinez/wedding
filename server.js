@@ -32,8 +32,9 @@ app.options("/api/submit-rsvp", cors(corsOptions)); // enable preflight for this
 
 app.use(express.json());
 
-// Google Sheets Auth setup
+// Google Sheets Auth setup - using credentials from environment variable
 const auth = new google.auth.GoogleAuth({
+  // Parse the service account JSON from env var (must be valid JSON string)
   credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });

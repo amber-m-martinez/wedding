@@ -71,12 +71,15 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     setIsSubmitting(true);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || "";
-      const response = await fetch(`${apiUrl}/api/submit-rsvp`, {
-        method: "POST",
-        body: JSON.stringify(rsvpData),
-        headers: { "Content-Type": "application/json" },
-      });
+      // const apiUrl = process.env.REACT_APP_API_URL || "";
+      const response = await fetch(
+        "https://wedding-r3hc.onrender.com/api/submit-rsvp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(rsvpData),
+        }
+      );
 
       const result = await response.json();
 

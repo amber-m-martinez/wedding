@@ -2,7 +2,6 @@
 const express = require("express");
 const { google } = require("googleapis");
 const cors = require("cors");
-const path = require("path");
 
 const app = express();
 
@@ -72,7 +71,6 @@ async function testAuth() {
 testAuth();
 
 const sheets = google.sheets({ version: "v4", auth });
-const gmail = google.gmail({ version: "v1", auth });
 const gmail = google.gmail({ version: "v1", auth });
 
 const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";

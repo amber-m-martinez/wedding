@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useScrollToHeader } from "./rsvp-utils";
 
 function GuestsAttending({
   guestList,
@@ -10,6 +11,8 @@ function GuestsAttending({
 }) {
   const [nextStep, setNextStep] = useState(null);
   const [individualResponses, setIndividualResponses] = useState({});
+
+  useScrollToHeader(60);
 
   useEffect(() => {
     if (guestSelected === "Salvador Martinez (Father of the bride)") {
@@ -191,19 +194,17 @@ function GuestsAttending({
   });
 
   useEffect(() => {
-    setNextStep(
-      allResponded
-        ? anyAttending
-          ? "Meal preferences"
-          : "Complete RSVP"
-        : null
-    );
+    if (allResponded) {
+      setNextStep(anyAttending ? "Meal preferences" : "Confirmation page");
+    } else {
+      setNextStep(null);
+    }
   }, [allResponded, anyAttending]);
 
   const buttonText = allResponded
     ? anyAttending
       ? "Next: Select meal preferences \u00A0⇨"
-      : "Complete RSVP \u00A0⇨"
+      : "Confirm RSVP \u00A0⇨"
     : "Next \u00A0⇨";
 
   return (
@@ -212,7 +213,7 @@ function GuestsAttending({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{ width: "100vw" }}
+      style={{ margin: "0px 10px" }}
     >
       <div className="page-container rsvp">
         <h4 style={{ fontWeight: 700, textAlign: "center", marginBottom: 10 }}>

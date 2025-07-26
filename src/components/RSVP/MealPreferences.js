@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useScrollToHeader } from "./rsvp-utils";
 
 function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
   const [mealSelections, setMealSelections] = useState({});
+
+  useScrollToHeader(60);
 
   // Get all guests from guestRSVP
   const getAllGuests = () => {
@@ -154,10 +157,6 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{
-        minHeight: "100vh",
-        width: "100vw",
-      }}
     >
       <div className="page-container rsvp">
         <h4 style={{ fontWeight: 700, textAlign: "center", marginBottom: 10 }}>

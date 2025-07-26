@@ -1,15 +1,30 @@
 import { motion } from "framer-motion";
+import { useScrollToHeader } from "./rsvp-utils";
 
 function CompleteRSVP({ guestRSVP }) {
+  useScrollToHeader(60);
+
+  // Check if any guest is attending any event
+  const hasAttendingGuests = () => {
+    return Object.keys(guestRSVP).some((partyName) => {
+      const party = guestRSVP[partyName];
+      if (party.guests) {
+        return Object.values(party.guests).some(
+          (guest) => guest.welcomeParty === true || guest.weddingDay === true
+        );
+      }
+      return false;
+    });
+  };
+
+  const anyoneAttending = hasAttendingGuests();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{
-        width: "100vw",
-      }}
     >
       <div className="page-container rsvp">
         <div
@@ -26,7 +41,9 @@ function CompleteRSVP({ guestRSVP }) {
             RSVP Successfully Submitted!
           </h5>
           <p style={{ fontSize: 16, color: "#2d5016", margin: 0 }}>
-            We look forward to celebrating with you!
+            {anyoneAttending
+              ? "We look forward to celebrating with you!"
+              : "Thank you for letting us know!"}
           </p>
         </div>
       </div>

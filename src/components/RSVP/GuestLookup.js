@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useScrollToHeader } from "./rsvp-utils";
 
 function GuestLookup({ guestList, setStep, setGuestSelected }) {
   const [query, setQuery] = useState("");
   const [matchingNames, setMatchingNames] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+
+  useScrollToHeader(60);
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -68,9 +71,6 @@ function GuestLookup({ guestList, setStep, setGuestSelected }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{
-        width: "100vw",
-      }}
     >
       <div className="page-container rsvp">
         <h4 style={{ fontWeight: 600, textAlign: "center", marginBottom: 10 }}>

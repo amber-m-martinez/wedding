@@ -50,6 +50,7 @@ button {
   border-radius: 4px;
   cursor: pointer;
   height: 35px;
+  color: #5f5f5f;
 }
 
 .attendance-button.attending {
@@ -657,6 +658,7 @@ input[type="checkbox"]:hover {
 
   .mealPreferencesButtonContainer {
     justify-self: center;
+    text-align: center;
   }
 
   .tooltip-wrapper .select-meal-button[disabled]::after {

@@ -91,9 +91,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     } catch (error) {
       console.error("Submission error:", error);
       alert(
-        `Error submitting RSVP. Please check your connection. ${
-          error.message
-        }, ${process.env.REACT_APP_API_URL || ""}/api/submit-rsvp`
+        `Error submitting RSVP. Please check your connection. ${error.message}`
       );
     } finally {
       setIsSubmitting(false);
@@ -110,9 +108,9 @@ function ConfirmationPage({ setStep, guestRSVP }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{ minHeight: "100vh", width: "100vw" }}
+      style={{ width: "100vw" }}
     >
-      <div className="page-container" style={{ maxWidth: 880, width: "100%" }}>
+      <div className="page-container rsvp">
         <h4 style={{ fontWeight: 700, textAlign: "center", marginBottom: 10 }}>
           RSVP Confirmation
         </h4>
@@ -120,33 +118,20 @@ function ConfirmationPage({ setStep, guestRSVP }) {
           Please review your RSVP details below.
         </p>
 
-        <div
-          style={{ maxWidth: 800, margin: "21px auto 0", padding: "0 20px" }}
-        >
-          <div
-            className="guest-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: 40,
-              width: 710,
-            }}
-          >
+        <div style={{ maxWidth: 800, padding: "0 20px", marginTop: 10 }}>
+          <div className="guest-grid">
             {attendingGuests.map((guest, index) => (
               <div
                 key={`${guest.name}-${index}`}
+                className="guestCard"
                 style={{
-                  width: "100%",
-                  padding: 20,
-                  border: "1px solid #ccc",
-                  borderRadius: 8,
                   backgroundColor: "#f9f9f9",
+                  width: 280,
                 }}
               >
-                <h5 style={{ marginBottom: 15, fontWeight: 700 }}>
+                <h5 style={{ marginBottom: 15, fontWeight: 700, marginTop: 5 }}>
                   {guest.name}
                 </h5>
-
                 <div style={{ marginBottom: 20 }}>
                   <p style={{ marginBottom: 8, fontSize: 17, fontWeight: 700 }}>
                     Attending Events:
@@ -192,7 +177,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                   </div>
                 )}
 
-                <div>
+                <div style={{ marginBottom: -6 }}>
                   <h6 style={{ fontWeight: 700, fontSize: 17 }}>
                     Dietary Information
                   </h6>
@@ -216,16 +201,20 @@ function ConfirmationPage({ setStep, guestRSVP }) {
               marginBottom: 120,
             }}
           >
-            <button onClick={handleBack} className="backButton">
-              ← Back
-            </button>
-            <button
-              onClick={sendRSVPToGoogleSheet}
-              className="confirmRSVPbutton"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Complete RSVP →"}
-            </button>
+            <div>
+              <button onClick={handleBack} className="backButton">
+                ← Back
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={sendRSVPToGoogleSheet}
+                disabled={isSubmitting}
+                className="completeRSVPButton"
+              >
+                {isSubmitting ? "Submitting..." : "Complete RSVP →"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

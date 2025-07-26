@@ -6,13 +6,11 @@ function GuestsAttending({
   setStep,
   guestSelected,
   setGuestSelected,
-  guestRSVP,
   setGuestRSVP,
 }) {
   const [nextStep, setNextStep] = useState(null);
   const [individualResponses, setIndividualResponses] = useState({});
 
-  // Normalize name on load
   useEffect(() => {
     if (guestSelected === "Salvador Martinez (Father of the bride)") {
       setGuestSelected("Salvador Martinez");
@@ -214,9 +212,9 @@ function GuestsAttending({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      style={{ minHeight: "100vh", width: "100vw" }}
+      style={{ width: "100vw" }}
     >
-      <div className="page-container" style={{ maxWidth: 880, width: "100%" }}>
+      <div className="page-container rsvp">
         <h4 style={{ fontWeight: 700, textAlign: "center", marginBottom: 10 }}>
           RSVP
         </h4>
@@ -235,25 +233,12 @@ function GuestsAttending({
           Please confirm attendance for each guest below.
         </p>
 
-        <div
-          style={{ maxWidth: 800, margin: "21px auto 0", padding: "0 20px" }}
-        >
-          <div
-            className="guest-grid"
-            style={{ display: "grid", gridTemplateColumns: "1fr", gap: 40 }}
-          >
+        <div style={{ maxWidth: 800, marginTop: 10, padding: "0 20px" }}>
+          <div className="guest-grid">
             {guests.map((guest) => {
               const response = individualResponses[guest.id] || {};
               return (
-                <div
-                  key={guest.id}
-                  style={{
-                    width: "100%",
-                    padding: 20,
-                    border: "1px solid #ccc",
-                    borderRadius: 8,
-                  }}
-                >
+                <div key={guest.id} className="guestCard">
                   <h5 style={{ marginBottom: 9, fontWeight: 700 }}>
                     {guest.name}
                   </h5>
@@ -380,9 +365,7 @@ function GuestsAttending({
             })}
           </div>
 
-          <div
-            style={{ justifySelf: "right", marginTop: 30, marginBottom: 120 }}
-          >
+          <div className="mealPreferencesButtonContainer">
             <div className="tooltip-wrapper">
               <button
                 disabled={!allResponded}

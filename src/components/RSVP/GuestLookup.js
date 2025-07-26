@@ -69,15 +69,16 @@ function GuestLookup({ guestList, setStep, setGuestSelected }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "100vh",
         width: "100vw",
       }}
     >
-      <div className="page-container">
+      <div className="page-container rsvp">
         <h4 style={{ fontWeight: 600, textAlign: "center", marginBottom: 10 }}>
           Enter your full name
         </h4>
-        <p>You will be able to RSVP for other members of your party as well.</p>
+        <p style={{ textAlign: "center" }}>
+          You will be able to RSVP for other members of your party as well.
+        </p>
 
         <div
           style={{

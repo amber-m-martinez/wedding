@@ -159,7 +159,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
         width: "100vw",
       }}
     >
-      <div className="page-container" style={{ maxWidth: 880, width: "100%" }}>
+      <div className="page-container rsvp">
         <h4 style={{ fontWeight: 700, textAlign: "center", marginBottom: 10 }}>
           Meal Preferences
         </h4>
@@ -170,29 +170,15 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
         <div
           style={{
             maxWidth: 800,
-            margin: "21px auto 0",
             padding: "0 20px",
+            marginTop: 10,
           }}
         >
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: 40,
-              width: 730,
-            }}
-            className="guest-grid"
-          >
+          <div className="guest-grid">
             {attendingGuests.map((guest, index) => (
               <div
                 key={`${guest.name}-${index}`}
-                style={{
-                  width: "100%",
-                  marginBottom: 0,
-                  padding: 20,
-                  border: "1px solid #ccc",
-                  borderRadius: 8,
-                }}
+                className="guestCard mealPreferences"
               >
                 <h5 style={{ marginBottom: 0, fontWeight: 700 }}>
                   {guest.name}

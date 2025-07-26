@@ -8,11 +8,10 @@ function CompleteRSVP({ guestRSVP }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       style={{
-        minHeight: "100vh",
         width: "100vw",
       }}
     >
-      <div className="page-container" style={{ maxWidth: 880, width: "100%" }}>
+      <div className="page-container rsvp">
         <div
           style={{
             textAlign: "center",

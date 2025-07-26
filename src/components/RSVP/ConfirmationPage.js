@@ -125,7 +125,11 @@ function ConfirmationPage({ setStep, guestRSVP }) {
         </p>
 
         <div style={{ maxWidth: 800, padding: "0 20px", marginTop: 10 }}>
-          <div className="guest-grid">
+          <div
+            className={`guest-grid ${
+              allGuests.length === 1 ? "single-guest" : ""
+            }`}
+          >
             {allGuests.map((guest, index) => {
               const isAttending = guest.welcomeParty || guest.weddingDay;
 

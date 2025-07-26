@@ -383,6 +383,11 @@ input[type="checkbox"]:hover {
   gap: 40px;
 }
 
+/* Center single guest cards */
+.guest-grid.single-guest {
+  justify-items: center;
+}
+
 .guestCard {
   width: 100%;
   padding: 20px;
@@ -639,6 +644,11 @@ input[type="checkbox"]:hover {
     gap: 30px;
   }
 
+  /* Keep single guest centered on mobile */
+  .guest-grid.single-guest {
+    justify-items: center;
+  }
+
   .select-meal-button {
     justify-self: center;
     width: 100%;
@@ -698,5 +708,11 @@ input[type="checkbox"]:hover {
 @media (min-width: 768px) {
   .guest-grid {
     grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* On desktop, center single guest cards */
+  .guest-grid.single-guest {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
   }
 }

@@ -235,7 +235,11 @@ function GuestsAttending({
         </p>
 
         <div style={{ maxWidth: 800, marginTop: 10, padding: "0 20px" }}>
-          <div className="guest-grid">
+          <div
+            className={`guest-grid ${
+              guests.length === 1 ? "single-guest" : ""
+            }`}
+          >
             {guests.map((guest) => {
               const response = individualResponses[guest.id] || {};
               return (

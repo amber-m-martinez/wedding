@@ -173,7 +173,11 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
             marginTop: 10,
           }}
         >
-          <div className="guest-grid">
+          <div
+            className={`guest-grid ${
+              attendingGuests.length === 1 ? "single-guest" : ""
+            }`}
+          >
             {attendingGuests.map((guest, index) => (
               <div
                 key={`${guest.name}-${index}`}

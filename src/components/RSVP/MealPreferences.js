@@ -243,7 +243,9 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
                           >
                             <input
                               type="radio"
-                              style={{ accentColor: "#ffdee8" }}
+                              style={{
+                                accentColor: "#ffdee8",
+                              }}
                               name={`${guest.name}-entree`}
                               checked={
                                 mealSelections[guest.name]?.entree ===
@@ -363,6 +365,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
                       borderRadius: 4,
                       resize: "vertical",
                       fontFamily: "inherit",
+                      color: "#5f5f5f",
                     }}
                   />
                 </div>
@@ -389,6 +392,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
                       borderRadius: 4,
                       resize: "vertical",
                       fontFamily: "inherit",
+                      color: "#5f5f5f",
                     }}
                   />
                 </div>

@@ -132,16 +132,23 @@ function formatRSVPForEmail(rsvpData) {
   const baseUrl =
     process.env.BASE_FRONTEND_URL || "https://amberandstephen.info";
   const logoUrl = `${baseUrl}/images/swan-monogram-thin-grey.png`;
+  const attireLink = `${baseUrl}/attire`;
 
   let htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>RSVP Confirmation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Infant:ital,wght@0,400;0,700;1,400&display=swap');
+  body, p, h3 {
+    font-family: 'Cormorant Infant', Georgia, serif;
+  }
+</style>
 </head>
-<body style="margin: 0; padding: 0; font-family: "Cormorant Infant", serif; background-color: #f8f8f8;">
+<body style="margin: 0; padding: 0; background-color: #f8f8f8;">
   <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px 30px;">
     <div style="text-align: center; margin-bottom: 30px;">
       <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 150px; height: auto;" />
@@ -235,7 +242,38 @@ function formatRSVPForEmail(rsvpData) {
           })
           .join("")}
       </div>
-`;
+    `;
+
+    // Show Welcome Party first if attending both
+    const attendingWelcome = allGuests.some((g) => g.welcomeParty);
+    const attendingWedding = allGuests.some((g) => g.weddingDay);
+
+    if (attendingWelcome) {
+      htmlContent += `
+      <div style="margin: 40px 0;">
+        <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Welcome Party</h3>
+        <p style="margin: 4px 0;">Thursday, October 23rd, 2025</p>
+        <p style="margin: 4px 0;">Clover Club – 210 Smith St, Brooklyn, NY 11201</p>
+        <p style="margin: 4px 0;">5–7pm | Attire: <a href="${attireLink}" style="color: #555;">Elevated Smart Casual</a></p>
+        <p style="margin: 4px 0;">Join us for drinks and mingling in a cozy, cocktail-style setting.</p>
+      </div>`;
+    }
+
+    if (attendingWedding) {
+      htmlContent += `
+      <div style="margin: 40px 0;">
+        <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Wedding Day</h3>
+        <p style="margin: 4px 0;">Friday, October 24th, 2025</p>
+        <p style="margin: 4px 0;">Prospect Park Boathouse – 101 East Dr, Brooklyn, NY 11225</p>
+        <p style="margin: 4px 0;">5:00pm Arrival | Attire: <a href="${attireLink}" style="color: #555;">Black-Tie Optional</a></p>
+        <p style="margin: 4px 0;">5:30pm Ceremony by the Lullwater (outdoors)</p>
+        <p style="margin: 4px 0;">6:00pm Cocktails & hors d'oeuvres on the terrace</p>
+        <p style="margin: 4px 0;">7:00pm Dinner inside the Boathouse</p>
+        <p style="margin: 10px 0;"><a href="https://maps.app.goo.gl/iGexChb4n3WyuamP7" style="color: #555;">View Google Map</a></p>
+        <img src="${baseUrl}/images/boathouse-event-map.png" alt="Boathouse Directions" style="width: 100%; max-width: 500px; border-radius: 8px; margin-top: 10px;" />
+        <p style="margin-top: 10px; font-size: 14px; color: #777;">Note: The Boathouse is not accessible by car. Use the designated drop‑off point and follow pedestrian-only paths. Staff will guide you. Parking is available along Willink Drive if needed.</p>
+      </div>`;
+    }
   }
 
   htmlContent += `
@@ -244,7 +282,7 @@ function formatRSVPForEmail(rsvpData) {
     </div>
     <div style="text-align: center; margin-bottom: 30px;">
       <p style="font-size: 16px; color: #333;">With love,</p>
-      <p style="font-size: 18px; color: #333; font-weight: 500;">Amber & Stephen</p>
+      <p style="font-size: 18px; color: #333; font-weight: 500;">Amber & Stephen ♡</p>
     </div>
     <div style="text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
       <p style="font-size: 12px; color: #999;">

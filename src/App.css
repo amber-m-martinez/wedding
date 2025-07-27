@@ -433,6 +433,10 @@ input[type="checkbox"]:hover {
   font-weight: 600;
 }
 
+.email-button:hover {
+  color: #e88faa;
+}
+
 .completeRSVPButton:hover {
   color: #e88faa;
 }

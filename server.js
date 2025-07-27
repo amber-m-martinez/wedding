@@ -141,7 +141,7 @@ function formatRSVPForEmail(rsvpData) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSVP Confirmation</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Georgia, serif; background-color: #f8f8f8;">
+<body style="margin: 0; padding: 0; font-family: "Cormorant Infant", serif; background-color: #f8f8f8;">
   <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px 30px;">
     <div style="text-align: center; margin-bottom: 30px;">
       <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 150px; height: auto;" />

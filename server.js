@@ -117,217 +117,122 @@ app.get("/auth/callback", async (req, res) => {
   }
 });
 
-// Format RSVP data into HTML email
+// Format RSVP data into email text
 function formatRSVPForEmail(rsvpData) {
   if (!rsvpData || !Array.isArray(rsvpData.parties)) {
     return "Invalid RSVP data format.";
   }
 
-  let firstGuestName = "";
-  let hasAnyAttendance = false;
   let allGuests = [];
+  let firstGuestName = "";
 
-  // Collect all guests and check attendance
   rsvpData.parties.forEach((party) => {
-    if (party.guests) {
-      party.guests.forEach((guest) => {
-        if (!firstGuestName) firstGuestName = guest.name.split(" ")[0];
-        if (guest.weddingDay || guest.welcomeParty) hasAnyAttendance = true;
-        allGuests.push({
-          ...guest,
-          partyName: party.partyName,
-        });
+    party.guests.forEach((guest) => {
+      if (!firstGuestName) firstGuestName = guest.name.split(" ")[0];
+      allGuests.push({
+        ...guest,
+        partyName: party.partyName,
+        mealPrefs: (party.mealPreferences || {})[guest.name] || {},
       });
-    }
+    });
   });
 
-  const baseUrl =
-    process.env.BASE_FRONTEND_URL || "https://amberandstephen.info";
-  const logoUrl = `${baseUrl}/images/swan-monogram-thin-grey.png`;
+  const guestSections = allGuests.map((guest) => {
+    const { mealPrefs } = guest;
 
-  let htmlContent = `
+    const dietary = [];
+    if (mealPrefs.vegan) dietary.push("Vegan");
+    if (mealPrefs.vegetarian) dietary.push("Vegetarian");
+    if (mealPrefs.glutenFree) dietary.push("Gluten Free");
+    if (mealPrefs.dairyFree) dietary.push("Dairy Free");
+    if (mealPrefs.nutFree) dietary.push("Nut Free");
+
+    return `
+      <div style="margin-top: 30px;">
+        <p style="font-size: 16px; color: #444;"><strong>${
+          guest.name
+        }</strong></p>
+        <ul style="list-style: none; padding: 0; font-size: 15px; color: #555;">
+          <li>• Welcome Party: <strong>${
+            guest.welcomeParty ? "Yes" : "No"
+          }</strong></li>
+          <li>• Wedding Day: <strong>${
+            guest.weddingDay ? "Yes" : "No"
+          }</strong></li>
+          <li>• Entree: <strong>${
+            mealPrefs.entree || "Not specified"
+          }</strong></li>
+          <li>• Cake: <strong>${mealPrefs.cake || "Not specified"}</strong></li>
+          ${
+            dietary.length > 0
+              ? `<li>• Dietary: <strong>${dietary.join(", ")}</strong></li>`
+              : ""
+          }
+          ${
+            mealPrefs.dietaryRestrictions
+              ? `<li>• Restrictions: <strong>${mealPrefs.dietaryRestrictions}</strong></li>`
+              : ""
+          }
+          ${
+            mealPrefs.allergies
+              ? `<li>• Allergies: <strong>${mealPrefs.allergies}</strong></li>`
+              : ""
+          }
+        </ul>
+      </div>
+    `;
+  });
+
+  return `
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSVP Confirmation</title>
+  <meta charset="UTF-8">
+  <title>RSVP Confirmation</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Georgia, serif; background-color: #f8f8f8;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px 30px;">
-        <!-- Header with Logo -->
-        <div style="text-align: center; margin-bottom: 30px;">
-            <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 150px; height: auto;" />
-        </div>
-        
-        <!-- Greeting -->
-        <div style="margin-bottom: 30px;">
-            <p style="font-size: 18px; color: #333; margin: 0;">Dear ${firstGuestName},</p>
-        </div>
-        
-        <!-- Thank you message -->
-        <div style="margin-bottom: 30px;">
-            <p style="font-size: 16px; color: #666; line-height: 1.6; margin: 0;">
-                ${
-                  hasAnyAttendance
-                    ? "Thank you for your RSVP! Here are your confirmation details:"
-                    : "Thank you for letting us know you won't be able to join us. We'll miss celebrating with you!"
-                }
-            </p>
-        </div>
-`;
+<body style="margin: 0; padding: 40px 20px; font-family: Georgia, serif; background-color: #f4f4f4; color: #333;">
+  <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 40px 30px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
 
-  if (hasAnyAttendance) {
-    htmlContent += `
-        <!-- Guest Details -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="font-size: 18px; color: #333; margin: 0 0 20px 0; font-weight: bold;">Guest Details</h3>
-            
-            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
-`;
-
-    allGuests.forEach((guest, index) => {
-      if (guest.weddingDay || guest.welcomeParty) {
-        htmlContent += `
-                <div style="margin-bottom: ${
-                  index === allGuests.length - 1 ? "0" : "15px"
-                }; padding-bottom: ${
-          index === allGuests.length - 1 ? "0" : "15px"
-        }; ${
-          index !== allGuests.length - 1
-            ? "border-bottom: 1px solid #e0e0e0;"
-            : ""
-        }">
-                    <p style="font-size: 16px; color: #333; margin: 0 0 8px 0; font-weight: 500;">${
-                      guest.name
-                    }</p>
-                    <p style="font-size: 14px; color: #666; margin: 0 0 4px 0;">• Welcome Party: ${
-                      guest.welcomeParty ? "Yes" : "No"
-                    }</p>
-                    <p style="font-size: 14px; color: #666; margin: 0;">• Wedding Day: ${
-                      guest.weddingDay ? "Yes" : "No"
-                    }</p>
-                </div>
-`;
-      }
-    });
-
-    htmlContent += `
-            </div>
-        </div>
-`;
-
-    // Add meal preferences section
-    let hasMealPrefs = false;
-    let mealPrefsContent = "";
-
-    rsvpData.parties.forEach((party) => {
-      if (
-        party.mealPreferences &&
-        Object.keys(party.mealPreferences).length > 0
-      ) {
-        hasMealPrefs = true;
-        Object.entries(party.mealPreferences).forEach(([guestName, prefs]) => {
-          // Check if this guest is actually attending
-          const attendingGuest = allGuests.find(
-            (g) => g.name === guestName && (g.weddingDay || g.welcomeParty)
-          );
-          if (attendingGuest) {
-            mealPrefsContent += `
-                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0;">
-                    <p style="font-size: 16px; color: #333; margin: 0 0 8px 0; font-weight: 500;">${guestName}</p>
-                    <p style="font-size: 14px; color: #666; margin: 0 0 4px 0;">• Entree: ${
-                      prefs.entree || "Not specified"
-                    }</p>
-                    <p style="font-size: 14px; color: #666; margin: 0 0 4px 0;">• Cake: ${
-                      prefs.cake || "Not specified"
-                    }</p>
-`;
-
-            // Add dietary preferences
-            const dietaryItems = [];
-            if (prefs.vegan) dietaryItems.push("Vegan");
-            if (prefs.vegetarian) dietaryItems.push("Vegetarian");
-            if (prefs.glutenFree) dietaryItems.push("Gluten Free");
-            if (prefs.dairyFree) dietaryItems.push("Dairy Free");
-            if (prefs.nutFree) dietaryItems.push("Nut Free");
-
-            if (dietaryItems.length > 0) {
-              mealPrefsContent += `<p style="font-size: 14px; color: #666; margin: 0 0 4px 0;">• Dietary Preferences: ${dietaryItems.join(
-                ", "
-              )}</p>`;
-            }
-
-            if (prefs.dietaryRestrictions) {
-              mealPrefsContent += `<p style="font-size: 14px; color: #666; margin: 0 0 4px 0;">• Dietary Restrictions: ${prefs.dietaryRestrictions}</p>`;
-            }
-            if (prefs.allergies) {
-              mealPrefsContent += `<p style="font-size: 14px; color: #666; margin: 0;">• Allergies: ${prefs.allergies}</p>`;
-            }
-
-            mealPrefsContent += `</div>`;
-          }
-        });
-      }
-    });
-
-    if (hasMealPrefs && mealPrefsContent) {
-      // Remove the last border-bottom
-      mealPrefsContent = mealPrefsContent.replace(
-        /border-bottom: 1px solid #e0e0e0;">([^<]*)$/,
-        '">$1'
-      );
-
-      htmlContent += `
-        <!-- Meal Preferences -->
-        <div style="margin-bottom: 30px;">
-            <h3 style="font-size: 18px; color: #333; margin: 0 0 20px 0; font-weight: bold;">Meal Preferences</h3>
-            
-            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
-                ${mealPrefsContent}
-            </div>
-        </div>
-`;
-    }
-  }
-
-  htmlContent += `
-        <!-- Closing Message -->
-        <div style="margin-bottom: 30px; text-align: center;">
-            <p style="font-size: 16px; color: #666; line-height: 1.6; margin: 0;">
-                Thank you for letting us know!
-            </p>
-        </div>
-        
-        <!-- Signature -->
-        <div style="text-align: center; margin-bottom: 30px;">
-            <p style="font-size: 16px; color: #333; margin: 0;">With love,</p>
-            <p style="font-size: 18px; color: #333; margin: 5px 0 0 0; font-weight: 500;">Amber & Stephen</p>
-        </div>
-        
-        <!-- Footer -->
-        <div style="text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
-            <p style="font-size: 12px; color: #999; margin: 0;">
-                This is an automated confirmation email. If you need to make changes to your RSVP, please contact us directly.
-            </p>
-        </div>
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="font-size: 40px; color: #28a745;">✔</div>
+      <h1 style="margin: 10px 0 0 0; font-size: 28px; color: #333;">R.S.V.P Confirmed</h1>
     </div>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+    <p style="font-size: 16px; color: #555;">Dear <strong>${firstGuestName}</strong>,</p>
+
+    <p style="font-size: 16px; color: #555;">
+      Thank you for your RSVP! Below are your confirmation details for Amber & Stephen's wedding.
+    </p>
+
+    ${guestSections.join("")}
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+    <p style="font-size: 16px; text-align: center; color: #555;">
+      With love,<br>
+      <strong>Amber & Stephen</strong>
+    </p>
+
+    <p style="text-align: center; font-size: 12px; color: #aaa; margin-top: 40px;">
+      This is an automated confirmation email. If you need to make changes to your RSVP, please contact us directly.
+    </p>
+  </div>
 </body>
 </html>`;
-
-  return htmlContent;
 }
 
-// Create a properly formatted Gmail message with HTML
-function createEmailMessage(to, from, subject, htmlContent) {
+// Create a properly formatted Gmail message
+function createEmailMessage(to, from, subject, textContent) {
   const email = [
     `To: ${to}`,
     `From: ${from}`,
     `Subject: ${subject}`,
-    `Content-Type: text/html; charset=UTF-8`,
+    `Content-Type: text/plain; charset=UTF-8`,
     `MIME-Version: 1.0`,
     "",
-    htmlContent,
+    textContent,
   ].join("\r\n");
 
   return Buffer.from(email)
@@ -378,7 +283,7 @@ app.post("/api/submit-rsvp", async (req, res) => {
   }
 });
 
-// Email confirmation endpoint (updated for HTML email)
+// Email confirmation endpoint (updated for OAuth2)
 app.post("/api/send-rsvp-email", async (req, res) => {
   try {
     const { to, rsvpData } = req.body;
@@ -403,11 +308,11 @@ app.post("/api/send-rsvp-email", async (req, res) => {
       });
     }
 
-    const htmlContent = formatRSVPForEmail(rsvpData);
+    const emailContent = formatRSVPForEmail(rsvpData);
     const subject = "RSVP Confirmation - Amber & Stephen's Wedding";
     const fromEmail = process.env.GMAIL_FROM_EMAIL || "your-email@gmail.com"; // Set this to your Gmail
 
-    const raw = createEmailMessage(to, fromEmail, subject, htmlContent);
+    const raw = createEmailMessage(to, fromEmail, subject, emailContent);
 
     const response = await gmail.users.messages.send({
       userId: "me",

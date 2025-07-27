@@ -1,394 +1,497 @@
-const express = require("express");
-const { google } = require("googleapis");
-const cors = require("cors");
-const app = express();
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { useScrollToHeader } from "./rsvp-utils";
 
-const allowedOrigins = [
-  process.env.BASE_FRONTEND_URL || "https://amberandstephen.info",
-  "http://localhost:3000",
-  "https://wedding-r3hc.onrender.com",
-];
+function CompleteRSVP({ guestRSVP }) {
+  useScrollToHeader(60);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(
-      new Error(`The CORS policy does not allow access from origin: ${origin}`),
-      false
-    );
-  },
-  methods: ["POST", "GET"],
-  credentials: true,
-};
+  const [emailSent, setEmailSent] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [showEmailInput, setShowEmailInput] = useState(false);
 
-app.use(cors(corsOptions));
-app.use(express.json());
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GMAIL_CLIENT_ID,
-  process.env.GMAIL_CLIENT_SECRET,
-  process.env.GMAIL_REDIRECT_URI
-);
-
-if (process.env.GMAIL_REFRESH_TOKEN) {
-  oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN,
-    access_token: process.env.GMAIL_ACCESS_TOKEN,
-  });
-}
-
-const sheetsAuth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-});
-
-const sheets = google.sheets({ version: "v4", auth: sheetsAuth });
-const gmail = google.gmail({ version: "v1", auth: oauth2Client });
-
-const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";
-const RANGE = "RSVPs!A:J";
-
-async function testGmailAuth() {
-  try {
-    await oauth2Client.getAccessToken();
-    console.log("✅ Gmail OAuth2 Auth Succeeded");
-  } catch (err) {
-    console.error("❌ Gmail OAuth2 Auth Failed:", err.message);
-    console.log("🔗 You may need to authorize the app first. Visit /auth/url");
-  }
-}
-
-testGmailAuth();
-
-app.get("/auth/url", (req, res) => {
-  const scopes = [
-    "https://www.googleapis.com/auth/gmail.send",
-    "https://www.googleapis.com/auth/gmail.compose",
+  // Entree and cake options with descriptions
+  const entreeOptions = [
+    { name: "Grilled Hanger Steak", description: "GF, dairy" },
+    { name: "Roasted Chicken Breast", description: "GF, dairy" },
   ];
 
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: scopes,
-    prompt: "consent",
-  });
+  const cakeOptions = [
+    { name: "Lemon Blueberry", description: "Gluten, dairy" },
+    { name: "Strawberry Shortcake", description: "Gluten, dairy" },
+    { name: "Bananas Foster", description: "Gluten, dairy" },
+    { name: "Olive Oil Pistachio & Fig", description: "Gluten, dairy, nuts" },
+    { name: "Vanilla & Raspberry Jam", description: "GF, vegan" },
+  ];
 
-  console.log("🔗 Visit this URL to authorize the app:", authUrl);
-  res.json({ authUrl });
-});
+  // Helper function to get description from options by name
+  const getDescription = (options, name) => {
+    const option = options.find((opt) => opt.name === name);
+    return option ? option.description : "";
+  };
 
-app.get("/auth/callback", async (req, res) => {
-  const { code } = req.query;
-  if (!code) return res.status(400).send("Authorization code not provided");
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-  try {
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
+  const normalizeRSVPDataForEmail = (originalRSVP) => {
+    const parties = [];
 
-    console.log("✅ OAuth2 tokens received:");
-    console.log("Access Token:", tokens.access_token ? "✓" : "✗");
-    console.log("Refresh Token:", tokens.refresh_token ? "✓" : "✗");
+    Object.entries(originalRSVP).forEach(([partyName, party]) => {
+      const guestsArray = Object.values(party.guests || {});
+      const mealPreferences = party.mealPreferences || {};
 
-    console.log("\n🔧 Add these to your environment variables:");
-    console.log(`GMAIL_ACCESS_TOKEN=${tokens.access_token}`);
-    if (tokens.refresh_token) {
-      console.log(`GMAIL_REFRESH_TOKEN=${tokens.refresh_token}`);
-    }
-
-    res.send(`
-      <h2>Authorization Successful!</h2>
-      <p>Check your server console for the tokens to add to your environment variables.</p>
-      <p>You can now send emails through the API.</p>
-    `);
-  } catch (error) {
-    console.error("❌ Error getting OAuth2 tokens:", error);
-    res.status(500).send("Error during authorization");
-  }
-});
-
-function formatRSVPForEmail(rsvpData) {
-  if (!rsvpData || !Array.isArray(rsvpData.parties)) {
-    return "Invalid RSVP data format.";
-  }
-
-  let firstGuestName = "";
-  let hasAnyAttendance = false;
-  let allGuests = [];
-
-  rsvpData.parties.forEach((party) => {
-    if (party.guests) {
-      party.guests.forEach((guest) => {
-        if (!firstGuestName) firstGuestName = guest.name.split(" ")[0];
-        if (guest.weddingDay || guest.welcomeParty) hasAnyAttendance = true;
-        allGuests.push({
-          ...guest,
-          partyName: party.partyName,
-        });
+      parties.push({
+        partyName,
+        guests: guestsArray.map((guest) => ({
+          name: guest.name,
+          welcomeParty: guest.welcomeParty,
+          weddingDay: guest.weddingDay,
+        })),
+        mealPreferences,
       });
+    });
+
+    return { parties };
+  };
+
+  const hasAttendingGuests = () => {
+    return Object.keys(guestRSVP).some((partyName) => {
+      const party = guestRSVP[partyName];
+      if (party.guests) {
+        return Object.values(party.guests).some(
+          (guest) => guest.welcomeParty === true || guest.weddingDay === true
+        );
+      }
+      return false;
+    });
+  };
+
+  const anyoneAttending = hasAttendingGuests();
+
+  const formatRSVPForDisplay = () => {
+    const summary = {
+      parties: [],
+      totalWeddingDay: 0,
+      totalWelcomeParty: 0,
+    };
+
+    Object.entries(guestRSVP).forEach(([partyName, party]) => {
+      if (party.guests) {
+        const partyGuests = Object.values(party.guests);
+        const weddingDayCount = partyGuests.filter(
+          (guest) => guest.weddingDay
+        ).length;
+        const welcomePartyCount = partyGuests.filter(
+          (guest) => guest.welcomeParty
+        ).length;
+
+        summary.parties.push({
+          name: partyName,
+          guests: partyGuests,
+          weddingDayCount,
+          welcomePartyCount,
+          mealPreferences: party.mealPreferences || {},
+        });
+
+        summary.totalWeddingDay += weddingDayCount;
+        summary.totalWelcomeParty += welcomePartyCount;
+      }
+    });
+
+    return summary;
+  };
+
+  const rsvpSummary = formatRSVPForDisplay();
+
+  const handleEmailButtonClick = () => {
+    setShowEmailInput(true);
+  };
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedEmail) {
+      alert("Email address is required to send confirmation.");
+      return;
     }
-  });
 
-  const baseUrl =
-    process.env.BASE_FRONTEND_URL || "https://amberandstephen.info";
-  const logoUrl = `${baseUrl}/images/swan-monogram-thin-grey.png`;
+    if (!isValidEmail(trimmedEmail)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
 
-  let htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSVP Confirmation</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: Georgia, serif; background-color: #f8f8f8;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px 30px;">
-    <div style="text-align: center; margin-bottom: 30px;">
-      <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 150px; height: auto;" />
-    </div>
-    <div style="margin-bottom: 30px;">
-      <p style="font-size: 18px; color: #333;">Dear ${firstGuestName},</p>
-    </div>
-    <div style="margin-bottom: 30px;">
-      <p style="font-size: 16px; color: #666; line-height: 1.6;">
-        ${
-          hasAnyAttendance
-            ? "Thank you for your RSVP! Here are your confirmation details:"
-            : "Thank you for letting us know you won't be able to join us. We'll miss celebrating with you!"
+    await sendConfirmationEmail(trimmedEmail);
+  };
+
+  const sendConfirmationEmail = async (emailAddress) => {
+    setSendingEmail(true);
+
+    const rsvpDataForEmail = normalizeRSVPDataForEmail(guestRSVP);
+
+    try {
+      const response = await fetch(
+        "https://wedding-r3hc.onrender.com/api/send-rsvp-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            to: emailAddress,
+            rsvpData: rsvpDataForEmail,
+          }),
         }
-      </p>
-    </div>
-`;
+      );
 
-  if (hasAnyAttendance) {
-    htmlContent += `
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 18px; color: #333; margin: 0 0 20px; font-weight: bold;">Guest Summary</h3>
-        ${allGuests
-          .filter((guest) => guest.welcomeParty || guest.weddingDay)
-          .map((guest) => {
-            const prefs =
-              rsvpData.parties.find((p) => p.partyName === guest.partyName)
-                ?.mealPreferences?.[guest.name] || {};
+      const result = await response.json();
 
-            const entreeLabel = prefs.entree || "Not specified";
-            const cakeLabel = prefs.cake || "Not specified";
+      if (response.ok && result.success) {
+        setEmailSent(true);
+        setShowEmailInput(false);
+      } else {
+        throw new Error(
+          result.message || result.error || "Email sending failed"
+        );
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      alert(
+        `Error sending email: ${error.message}\n\nPlease save this page or take a screenshot for your records.`
+      );
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
-            const dietaryTags = [];
-            if (prefs.vegan) dietaryTags.push("Vegan");
-            if (prefs.vegetarian) dietaryTags.push("Vegetarian");
-            if (prefs.glutenFree) dietaryTags.push("Gluten Free");
-            if (prefs.dairyFree) dietaryTags.push("Dairy Free");
-            if (prefs.nutFree) dietaryTags.push("Nut Free");
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="page-container rsvp" style={{ marginBottom: 70 }}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "20px",
+            backgroundColor: "#e8f5e8",
+            border: "1px solid #c3e6c3",
+            borderRadius: 4,
+            marginBottom: 25,
+            color: "#2d5016",
+          }}
+        >
+          <h5 style={{ marginBottom: 10 }}>RSVP Successfully Submitted!</h5>
+          <p style={{ fontSize: 16, margin: 0 }}>
+            {anyoneAttending
+              ? "We look forward to celebrating with you!"
+              : "Thank you for letting us know!"}
+          </p>
+          <div
+            style={{
+              textAlign: "center",
+              marginBottom: 5,
+              justifySelf: "center",
+            }}
+          >
+            <AnimatePresence mode="wait">
+              {!emailSent ? (
+                <motion.div
+                  key="email-section"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0 }}
+                >
+                  <AnimatePresence mode="wait">
+                    {!showEmailInput ? (
+                      <motion.button
+                        key="email-button"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 1 }}
+                        transition={{ duration: 0.3, exit: { duration: 0 } }}
+                        onClick={handleEmailButtonClick}
+                        style={{ marginTop: 19 }}
+                        className="emailConfirmation"
+                      >
+                        Email me a confirmation
+                      </motion.button>
+                    ) : (
+                      <motion.div
+                        key="email-form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 1 }}
+                        transition={{ duration: 0.3, exit: { duration: 0 } }}
+                        style={{
+                          maxWidth: "400px",
+                          margin: "0 auto",
+                          marginTop: 10,
+                        }}
+                      >
+                        <p>Share your email address:</p>
+                        <form onSubmit={handleEmailSubmit}>
+                          <div style={{ marginBottom: 0 }}>
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="Enter your email address"
+                              required
+                              style={{
+                                padding: "10px 12px",
+                                borderRadius: 4,
+                                border: "1px solid #ccc",
+                                fontSize: 14,
+                                width: 260,
+                                boxSizing: "border-box",
+                                marginBottom: -5,
+                              }}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              gap: 45,
+                              marginTop: 0,
+                            }}
+                          >
+                            <button
+                              type="submit"
+                              className="emailConfirmationButton"
+                              disabled={sendingEmail}
+                              style={{
+                                backgroundColor: "#2d5016",
+                                color: "white",
+                                border: "none",
+                                padding: "10px 0px",
+                                borderRadius: 4,
+                                fontSize: 14,
+                                cursor: sendingEmail
+                                  ? "not-allowed"
+                                  : "pointer",
+                                opacity: sendingEmail ? 0.6 : 1,
+                                flex: 1,
+                              }}
+                            >
+                              {sendingEmail ? "Sending..." : "Send"}
+                            </button>
+                            <button
+                              type="button"
+                              className="emailConfirmationButton"
+                              onClick={() => setShowEmailInput(false)}
+                              disabled={sendingEmail}
+                              style={{
+                                backgroundColor: "#6c757d",
+                                color: "white",
+                                border: "none",
+                                padding: "10px 0px",
+                                borderRadius: 4,
+                                fontSize: 14,
+                                cursor: sendingEmail
+                                  ? "not-allowed"
+                                  : "pointer",
+                                opacity: sendingEmail ? 0.6 : 1,
+                                flex: 1,
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="success-message"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  style={{
+                    padding: "12px",
+                    backgroundColor: "#d4edda",
+                    border: "1px solid #c3e6cb",
+                    borderRadius: 4,
+                    color: "#155724",
+                    marginTop: 15,
+                  }}
+                >
+                  ✓ Confirmation email sent successfully!
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
 
-            return `
-            <div style="margin-bottom: 20px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #f9f9f9;">
-              <p style="margin: 0 0 6px; font-size: 16px; font-weight: 600;">${
-                guest.name
-              }</p>
-              <p style="margin: 4px 0; font-size: 15px;">Events: ${
-                !guest.welcomeParty && !guest.weddingDay
-                  ? "Not Attending"
-                  : `${guest.welcomeParty ? "Welcome Party" : ""}${
-                      guest.welcomeParty && guest.weddingDay ? ", " : ""
-                    }${guest.weddingDay ? "Wedding Day" : ""}`
-              }</p>
-              <p style="margin: 4px 0; font-size: 15px;">Entree: ${entreeLabel}
-                ${
-                  entreeLabel !== "Not specified"
-                    ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
-                        entreeLabel,
-                        "entree"
-                      )}</span>`
-                    : ""
-                }
-              </p>
-              <p style="margin: 4px 0; font-size: 15px;">Cake: ${cakeLabel}
-                ${
-                  cakeLabel !== "Not specified"
-                    ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
-                        cakeLabel,
-                        "cake"
-                      )}</span>`
-                    : ""
-                }
-              </p>
-              ${
-                prefs.dietaryRestrictions
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Restrictions: ${prefs.dietaryRestrictions}</p>`
-                  : ""
-              }
-              ${
-                prefs.allergies
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Allergies: ${prefs.allergies}</p>`
-                  : ""
-              }
-              ${
-                dietaryTags.length > 0
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Preferences: ${dietaryTags.join(
-                      ", "
-                    )}</p>`
-                  : ""
-              }
-            </div>
-          `;
-          })
-          .join("")}
+        {anyoneAttending && (
+          <motion.div
+            layout
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={{
+              backgroundColor: "#f9f9f9",
+              border: "1px solid #ddd",
+              borderRadius: 4,
+              padding: "20px",
+              marginBottom: 20,
+              width: 370,
+            }}
+          >
+            <p
+              style={{
+                fontWeight: 600,
+                marginBottom: 10,
+                fontSize: 17,
+              }}
+            >
+              Your RSVP Summary:
+            </p>
+
+            {rsvpSummary.parties.map((party, partyIndex) => (
+              <div
+                key={partyIndex}
+                style={{ marginBottom: 20, color: "#5f5f5f" }}
+              >
+                <p
+                  style={{
+                    fontWeight: 650,
+                    marginBottom: 10,
+                    fontSize: 16,
+                    marginLeft: 6,
+                  }}
+                >
+                  Attendance:
+                </p>
+                <div style={{ marginBottom: 15, fontSize: 16 }}>
+                  {party.guests.map((guest, guestIndex) => (
+                    <div
+                      key={guestIndex}
+                      style={{ marginLeft: 12, marginBottom: 8 }}
+                    >
+                      <p style={{ margin: "2px 0", fontWeight: 550 }}>
+                        {guest.name}
+                      </p>
+                      <p style={{ margin: "2px 0", fontSize: 16 }}>
+                        Events:{" "}
+                        {!guest.welcomeParty && !guest.weddingDay
+                          ? "Not Attending"
+                          : `${guest.welcomeParty ? "Welcome Party" : ""}${
+                              guest.welcomeParty && guest.weddingDay ? ", " : ""
+                            }${guest.weddingDay ? "Wedding Day" : ""}`}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {party.mealPreferences &&
+                  Object.keys(party.mealPreferences).length > 0 && (
+                    <div style={{ marginLeft: 6 }}>
+                      <p
+                        style={{
+                          fontWeight: 650,
+                          marginBottom: 10,
+                          fontSize: 16,
+                        }}
+                      >
+                        Meal Preferences:
+                      </p>
+                      {Object.entries(party.mealPreferences).map(
+                        ([guestName, prefs]) => (
+                          <div
+                            key={guestName}
+                            style={{
+                              marginLeft: 7,
+                              marginBottom: 8,
+                            }}
+                          >
+                            <p
+                              style={{
+                                margin: "2px 0",
+                                fontSize: 16,
+                                fontWeight: 550,
+                              }}
+                            >
+                              {guestName}
+                            </p>
+                            <p
+                              style={{
+                                margin: "2px 0",
+                                fontSize: 16,
+                              }}
+                            >
+                              Entree: {prefs.entree || "Not specified"}
+                              {getDescription(entreeOptions, prefs.entree) && (
+                                <span
+                                  style={{
+                                    fontStyle: "italic",
+                                    fontSize: 14,
+                                    marginLeft: 6,
+                                  }}
+                                >
+                                  {getDescription(entreeOptions, prefs.entree)}
+                                </span>
+                              )}
+                            </p>
+                            <p
+                              style={{
+                                margin: "2px 0",
+                                fontSize: 16,
+                              }}
+                            >
+                              Cake: {prefs.cake || "Not specified"}
+                              {getDescription(cakeOptions, prefs.cake) && (
+                                <span
+                                  style={{
+                                    fontStyle: "italic",
+                                    fontSize: 14,
+                                    marginLeft: 6,
+                                  }}
+                                >
+                                  {getDescription(cakeOptions, prefs.cake)}
+                                </span>
+                              )}
+                            </p>
+                            {prefs.dietaryRestrictions && (
+                              <p
+                                style={{
+                                  margin: "2px 0",
+                                  fontSize: 16,
+                                }}
+                              >
+                                Dietary Restrictions:{" "}
+                                {prefs.dietaryRestrictions}
+                              </p>
+                            )}
+                            {prefs.allergies && (
+                              <p
+                                style={{
+                                  margin: "2px 0",
+                                  fontSize: 16,
+                                }}
+                              >
+                                Allergies: {prefs.allergies}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+              </div>
+            ))}
+          </motion.div>
+        )}
       </div>
-`;
-  }
-
-  htmlContent += `
-    <div style="margin-bottom: 30px; text-align: center;">
-      <p style="font-size: 16px; color: #666;">Thank you for letting us know!</p>
-    </div>
-    <div style="text-align: center; margin-bottom: 30px;">
-      <p style="font-size: 16px; color: #333;">With love,</p>
-      <p style="font-size: 18px; color: #333; font-weight: 500;">Amber & Stephen</p>
-    </div>
-    <div style="text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
-      <p style="font-size: 12px; color: #999;">
-        This is an automated confirmation email. If you need to make changes to your RSVP, please contact us directly.
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-
-  return htmlContent;
-
-  function getMealDescription(name, type) {
-    const entreeDescriptions = {
-      "Grilled Hanger Steak": "GF, dairy",
-      "Roasted Chicken Breast": "GF, dairy",
-    };
-
-    const cakeDescriptions = {
-      "Lemon Blueberry": "Gluten, dairy",
-      "Strawberry Shortcake": "Gluten, dairy",
-      "Bananas Foster": "Gluten, dairy",
-      "Olive Oil Pistachio & Fig": "Gluten, dairy, nuts",
-      "Vanilla & Raspberry Jam": "GF, vegan",
-    };
-
-    if (type === "entree") return entreeDescriptions[name] || "";
-    if (type === "cake") return cakeDescriptions[name] || "";
-    return "";
-  }
+    </motion.div>
+  );
 }
 
-function createEmailMessage(to, from, subject, htmlContent) {
-  const email = [
-    `To: ${to}`,
-    `From: ${from}`,
-    `Subject: ${subject}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `MIME-Version: 1.0`,
-    "",
-    htmlContent,
-  ].join("\r\n");
-
-  return Buffer.from(email)
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
-app.post("/api/submit-rsvp", async (req, res) => {
-  try {
-    const rsvpData = req.body;
-    const rows = [];
-    const timestamp = new Date().toISOString();
-
-    rsvpData.parties.forEach((party) => {
-      party.guests.forEach((guest) => {
-        rows.push([
-          timestamp,
-          party.partyName,
-          guest.name,
-          guest.welcomeParty ? "Yes" : "No",
-          guest.weddingDay ? "Yes" : "No",
-          guest.entree || "",
-          guest.cake || "",
-          guest.dietaryRestrictions || "",
-          guest.allergies || "",
-        ]);
-      });
-    });
-
-    const response = await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: RANGE,
-      valueInputOption: "RAW",
-      requestBody: { values: rows },
-    });
-
-    console.log("✅ RSVP submitted to Google Sheets:", response.data);
-    res.json({ success: true, message: "RSVP submitted successfully!" });
-  } catch (error) {
-    console.error("❌ Error submitting RSVP:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Error submitting RSVP. Please try again later.",
-      });
-  }
-});
-
-app.post("/api/send-rsvp-email", async (req, res) => {
-  try {
-    const { to, rsvpData } = req.body;
-
-    if (!to || !rsvpData) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Missing email address or RSVP data.",
-        });
-    }
-
-    const credentials = oauth2Client.credentials;
-    if (!credentials || !credentials.access_token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Gmail authentication required." });
-    }
-
-    const htmlContent = formatRSVPForEmail(rsvpData);
-    const subject = "RSVP Confirmation - Amber & Stephen's Wedding";
-    const fromEmail = process.env.GMAIL_FROM_EMAIL || "your-email@gmail.com";
-
-    const raw = createEmailMessage(to, fromEmail, subject, htmlContent);
-
-    const response = await gmail.users.messages.send({
-      userId: "me",
-      requestBody: { raw },
-    });
-
-    console.log("✅ Email sent:", response.data);
-    res.json({
-      success: true,
-      message: "Confirmation email sent successfully!",
-      messageId: response.data.id,
-    });
-  } catch (error) {
-    console.error("❌ Error sending email:", error);
-    res
-      .status(error.code || 500)
-      .json({
-        success: false,
-        message: error.message || "Email failed to send.",
-      });
-  }
-});
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`✅ RSVP server running on port ${PORT}`);
-  console.log(`🔗 Authorization URL: http://localhost:${PORT}/auth/url`);
-});
-
-module.exports = app;
+export default CompleteRSVP;

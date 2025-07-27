@@ -7,6 +7,26 @@ function ConfirmationPage({ setStep, guestRSVP }) {
 
   useScrollToHeader(60);
 
+  // Define entree and cake options with descriptions (same as in MealPreferences)
+  const entreeOptions = [
+    { name: "Grilled Hanger Steak", description: "GF, dairy" },
+    { name: "Roasted Chicken Breast", description: "GF, dairy" },
+  ];
+
+  const cakeOptions = [
+    { name: "Lemon Blueberry", description: "Gluten, dairy" },
+    { name: "Strawberry Shortcake", description: "Gluten, dairy" },
+    { name: "Bananas Foster", description: "Gluten, dairy" },
+    { name: "Olive Oil Pistachio & Fig", description: "Gluten, dairy, nuts" },
+    { name: "Vanilla & Raspberry Jam", description: "GF, vegan" },
+  ];
+
+  // Helper to get description by name
+  const getDescription = (options, name) => {
+    const option = options.find((opt) => opt.name === name);
+    return option ? option.description : "";
+  };
+
   const getAllGuests = () => {
     const guests = [];
     Object.keys(guestRSVP).forEach((partyName) => {
@@ -127,7 +147,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                 className="guestCard"
                 style={{
                   backgroundColor: "#f9f9f9",
-                  width: 280,
+                  width: 350,
                 }}
               >
                 <h5 style={{ marginBottom: 15, fontWeight: 700, marginTop: 5 }}>
@@ -154,7 +174,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                         marginBottom: 9,
                         fontWeight: 700,
                         fontSize: 17,
-                        color: "#555",
+                        color: "#5f5f5f",
                       }}
                     >
                       Wedding Day Selections
@@ -163,30 +183,71 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                       <p
                         style={{
                           fontSize: 16,
-                          fontWeight: 500,
                           marginBottom: 5,
                         }}
                       >
                         Entree: {guest.mealPreferences.entree}
+                        {getDescription(
+                          entreeOptions,
+                          guest.mealPreferences.entree
+                        ) && (
+                          <span
+                            style={{
+                              marginLeft: 6,
+                              fontStyle: "italic",
+                              color: "#666",
+                              fontSize: 14,
+                            }}
+                          >
+                            (
+                            {getDescription(
+                              entreeOptions,
+                              guest.mealPreferences.entree
+                            )}
+                            )
+                          </span>
+                        )}
                       </p>
                     )}
                     {guest.mealPreferences.cake && (
-                      <p style={{ fontSize: 16, fontWeight: 500 }}>
+                      <p style={{ fontSize: 16 }}>
                         Cake: {guest.mealPreferences.cake}
+                        {getDescription(
+                          cakeOptions,
+                          guest.mealPreferences.cake
+                        ) && (
+                          <span
+                            style={{
+                              marginLeft: 6,
+                              fontStyle: "italic",
+                              color: "#666",
+                              fontSize: 14,
+                            }}
+                          >
+                            (
+                            {getDescription(
+                              cakeOptions,
+                              guest.mealPreferences.cake
+                            )}
+                            )
+                          </span>
+                        )}
                       </p>
                     )}
                   </div>
                 )}
 
-                <div style={{ marginBottom: -6 }}>
-                  <h6 style={{ fontWeight: 700, fontSize: 17 }}>
+                <div style={{ marginBottom: 10 }}>
+                  <h6
+                    style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}
+                  >
                     Dietary Information
                   </h6>
-                  <p style={{ fontSize: 16, fontWeight: 500, marginBottom: 5 }}>
+                  <p style={{ fontSize: 16, marginBottom: 5 }}>
                     Dietary Restrictions:{" "}
                     {guest.mealPreferences.dietaryRestrictions || "None"}
                   </p>
-                  <p style={{ fontSize: 16, fontWeight: 500 }}>
+                  <p style={{ fontSize: 16 }}>
                     Allergies: {guest.mealPreferences.allergies || "None"}
                   </p>
                 </div>

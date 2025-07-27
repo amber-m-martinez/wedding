@@ -13,7 +13,7 @@ function GuestCard({ data }) {
             width: 200,
             objectFit: "cover",
             border: ".2px solid #742935",
-            borderRadius: 8,
+            borderRadius: 4,
           }}
         />
       </div>

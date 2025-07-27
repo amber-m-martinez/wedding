@@ -1,83 +1,128 @@
-// server.js or index.js
 const express = require("express");
 const { google } = require("googleapis");
 const cors = require("cors");
-
 const app = express();
 
-// CORS setup: allow your frontend domains
+// Optional environment var for easier CORS updates
 const allowedOrigins = [
-  "https://amberandstephen.info",
+  process.env.BASE_FRONTEND_URL || "https://amberandstephen.info",
   "http://localhost:3000",
+  "https://wedding-r3hc.onrender.com",
 ];
 
+// CORS config
 const corsOptions = {
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      return callback(new Error(msg), false);
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    const msg = `The CORS policy does not allow access from origin: ${origin}`;
+    return callback(new Error(msg), false);
   },
-  methods: ["POST"],
+  methods: ["POST", "GET"], // Added GET for OAuth callback
   credentials: true,
 };
 
 app.use(cors(corsOptions));
-app.options("/api/submit-rsvp", cors(corsOptions)); // enable preflight for this route
-app.options("/api/send-rsvp-email", cors(corsOptions)); // enable preflight for email route
-app.options("/api/send-rsvp-email", cors(corsOptions)); // enable preflight for email route
-
 app.use(express.json());
 
-// Parse and debug your service account key before using it
-const creds = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY);
+// OAuth2 setup for Gmail
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GMAIL_CLIENT_ID,
+  process.env.GMAIL_CLIENT_SECRET,
+  process.env.GMAIL_REDIRECT_URI // Should be: http://localhost:3001/auth/callback for development
+);
 
-console.log("Service account email:", creds.client_email);
-console.log("private_key first 100 chars:", creds.private_key.slice(0, 100));
-console.log("Current server time:", new Date().toISOString());
-
-// Create Google Auth with both Sheets and Gmail scopes
-const auth = new google.auth.GoogleAuth({
-  credentials: creds,
-  scopes: [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/gmail.send",
-  ],
-});
-
-async function testAuth() {
-  try {
-    const auth = new google.auth.GoogleAuth({
-      credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
-      scopes: [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/gmail.send",
-      ],
-    });
-
-    const client = await auth.getClient();
-    const token = await client.getAccessToken();
-    console.log("Access token:", token.token);
-    console.log("Authentication succeeded!");
-  } catch (err) {
-    console.error("Authentication error:", err);
-  }
+// Set credentials if we have a refresh token
+if (process.env.GMAIL_REFRESH_TOKEN) {
+  oauth2Client.setCredentials({
+    refresh_token: process.env.GMAIL_REFRESH_TOKEN,
+    access_token: process.env.GMAIL_ACCESS_TOKEN, // Optional, will be auto-refreshed
+  });
 }
 
-testAuth();
+// Service Account setup for Google Sheets (keep this separate)
+const sheetsAuth = new google.auth.GoogleAuth({
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
 
-const sheets = google.sheets({ version: "v4", auth });
-const gmail = google.gmail({ version: "v1", auth });
+const sheets = google.sheets({ version: "v4", auth: sheetsAuth });
+const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
 const SPREADSHEET_ID = "1sKZcfKe_JgcEqQzXGN1n7CVaTrPVJ1PcR-asZ0Mo02A";
 const RANGE = "RSVPs!A:J";
 
-// Helper function to format RSVP data for email
+// Test Gmail auth
+async function testGmailAuth() {
+  try {
+    const accessToken = await oauth2Client.getAccessToken();
+    console.log("✅ Gmail OAuth2 Auth Succeeded");
+  } catch (err) {
+    console.error("❌ Gmail OAuth2 Auth Failed:", err.message);
+    console.log("🔗 You may need to authorize the app first. Visit /auth/url");
+  }
+}
+
+testGmailAuth();
+
+// OAuth2 authorization URL endpoint
+app.get("/auth/url", (req, res) => {
+  const scopes = [
+    "https://www.googleapis.com/auth/gmail.send",
+    "https://www.googleapis.com/auth/gmail.compose",
+  ];
+
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: "offline", // Important: gets refresh token
+    scope: scopes,
+    prompt: "consent", // Forces consent screen to get refresh token
+  });
+
+  console.log("🔗 Visit this URL to authorize the app:", authUrl);
+  res.json({ authUrl });
+});
+
+// OAuth2 callback endpoint
+app.get("/auth/callback", async (req, res) => {
+  const { code } = req.query;
+
+  if (!code) {
+    return res.status(400).send("Authorization code not provided");
+  }
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    console.log("✅ OAuth2 tokens received:");
+    console.log("Access Token:", tokens.access_token ? "✓" : "✗");
+    console.log("Refresh Token:", tokens.refresh_token ? "✓" : "✗");
+
+    // Save these tokens to your environment variables
+    console.log("\n🔧 Add these to your environment variables:");
+    console.log(`GMAIL_ACCESS_TOKEN=${tokens.access_token}`);
+    if (tokens.refresh_token) {
+      console.log(`GMAIL_REFRESH_TOKEN=${tokens.refresh_token}`);
+    }
+
+    res.send(`
+      <h2>Authorization Successful!</h2>
+      <p>Check your server console for the tokens to add to your environment variables.</p>
+      <p>You can now send emails through the API.</p>
+    `);
+  } catch (error) {
+    console.error("❌ Error getting OAuth2 tokens:", error);
+    res.status(500).send("Error during authorization");
+  }
+});
+
+// Format RSVP data into email text
 function formatRSVPForEmail(rsvpData) {
+  if (!rsvpData || !Array.isArray(rsvpData.parties)) {
+    return "Invalid RSVP data format.";
+  }
+
   let emailContent = `Dear Guest,\n\n`;
   emailContent += `Thank you for your RSVP! Here are your confirmation details:\n\n`;
 
@@ -85,10 +130,9 @@ function formatRSVPForEmail(rsvpData) {
   let totalWelcomeParty = 0;
   let firstGuestName = "";
 
-  // Calculate totals and get first guest name
-  Object.entries(rsvpData).forEach(([partyName, party]) => {
+  rsvpData.parties.forEach((party) => {
     if (party.guests) {
-      Object.values(party.guests).forEach((guest) => {
+      party.guests.forEach((guest) => {
         if (!firstGuestName) firstGuestName = guest.name.split(" ")[0];
         if (guest.weddingDay) totalWeddingDay++;
         if (guest.welcomeParty) totalWelcomeParty++;
@@ -96,79 +140,75 @@ function formatRSVPForEmail(rsvpData) {
     }
   });
 
-  // Update greeting with first guest name
   emailContent = emailContent.replace("Dear Guest", `Dear ${firstGuestName}`);
-
   emailContent += `EVENT ATTENDANCE:\n`;
   emailContent += `• Wedding Day: ${totalWeddingDay} guest(s)\n`;
   emailContent += `• Welcome Party: ${totalWelcomeParty} guest(s)\n\n`;
 
   emailContent += `GUEST DETAILS:\n`;
-  Object.entries(rsvpData).forEach(([partyName, party]) => {
+
+  rsvpData.parties.forEach((party) => {
+    const partyName = party.partyName;
+    emailContent += `${partyName}:\n`;
+
     if (party.guests) {
-      emailContent += `${partyName}:\n`;
-      Object.values(party.guests).forEach((guest, index) => {
+      party.guests.forEach((guest, index) => {
         emailContent += `  ${index + 1}. ${guest.name}\n`;
         emailContent += `     • Welcome Party: ${
           guest.welcomeParty ? "Yes" : "No"
         }\n`;
         emailContent += `     • Wedding Day: ${
           guest.weddingDay ? "Yes" : "No"
-        }\n`;
+        }\n\n`;
+      });
+    }
+
+    if (
+      party.mealPreferences &&
+      Object.keys(party.mealPreferences).length > 0
+    ) {
+      emailContent += `  Meal Preferences:\n`;
+      Object.entries(party.mealPreferences).forEach(([guestName, prefs]) => {
+        emailContent += `    ${guestName}:\n`;
+        emailContent += `      • Entree: ${prefs.entree || "Not specified"}\n`;
+        emailContent += `      • Cake: ${prefs.cake || "Not specified"}\n`;
+        if (prefs.dietaryRestrictions)
+          emailContent += `      • Dietary Restrictions: ${prefs.dietaryRestrictions}\n`;
+        if (prefs.allergies)
+          emailContent += `      • Allergies: ${prefs.allergies}\n`;
         emailContent += `\n`;
       });
-
-      // Add meal preferences for this party
-      if (
-        party.mealPreferences &&
-        Object.keys(party.mealPreferences).length > 0
-      ) {
-        emailContent += `  Meal Preferences:\n`;
-        Object.entries(party.mealPreferences).forEach(([guestName, prefs]) => {
-          emailContent += `    ${guestName}:\n`;
-          emailContent += `      • Entree: ${
-            prefs.entree || "Not specified"
-          }\n`;
-          emailContent += `      • Cake: ${prefs.cake || "Not specified"}\n`;
-          if (prefs.dietaryRestrictions)
-            emailContent += `      • Dietary Restrictions: ${prefs.dietaryRestrictions}\n`;
-          if (prefs.allergies)
-            emailContent += `      • Allergies: ${prefs.allergies}\n`;
-          emailContent += `\n`;
-        });
-      }
-      emailContent += `\n`;
     }
+
+    emailContent += `\n`;
   });
 
-  emailContent += `We're so excited to celebrate with you!\n\n`;
-  emailContent += `With love,\nAmber & Stephen\n\n`;
+  emailContent += `We're so excited to celebrate with you!\n\nWith love,\nAmber & Stephen\n\n`;
   emailContent += `---\nThis is an automated confirmation email. If you need to make changes to your RSVP, please contact us directly.`;
 
   return emailContent;
 }
 
-// Helper function to create email message
-function createEmailMessage(to, subject, textContent) {
+// Create a properly formatted Gmail message
+function createEmailMessage(to, from, subject, textContent) {
   const email = [
     `To: ${to}`,
+    `From: ${from}`,
     `Subject: ${subject}`,
     `Content-Type: text/plain; charset=UTF-8`,
+    `MIME-Version: 1.0`,
     "",
     textContent,
-  ].join("\n");
+  ].join("\r\n");
 
-  // Encode the email in base64url format
-  const encodedEmail = Buffer.from(email)
+  return Buffer.from(email)
     .toString("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-
-  return encodedEmail;
 }
 
-// RSVP POST endpoint
+// RSVP submission endpoint (unchanged)
 app.post("/api/submit-rsvp", async (req, res) => {
   try {
     const rsvpData = req.body;
@@ -198,10 +238,10 @@ app.post("/api/submit-rsvp", async (req, res) => {
       requestBody: { values: rows },
     });
 
-    console.log("RSVP data submitted:", response.data);
+    console.log("✅ RSVP submitted to Google Sheets:", response.data);
     res.json({ success: true, message: "RSVP submitted successfully!" });
   } catch (error) {
-    console.error("Error submitting RSVP:", error);
+    console.error("❌ Error submitting RSVP:", error);
     res.status(500).json({
       success: false,
       message: "Error submitting RSVP. Please try again later.",
@@ -209,55 +249,60 @@ app.post("/api/submit-rsvp", async (req, res) => {
   }
 });
 
-// Email confirmation endpoint
+// Email confirmation endpoint (updated for OAuth2)
 app.post("/api/send-rsvp-email", async (req, res) => {
   try {
     const { to, rsvpData } = req.body;
 
     if (!to) {
-      return res.status(400).json({
-        success: false,
-        message: "Email address is required",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Email address is required" });
     }
-
     if (!rsvpData) {
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({ success: false, message: "RSVP data is required" });
+    }
+
+    // Check if we have valid credentials
+    const credentials = oauth2Client.credentials;
+    if (!credentials || !credentials.access_token) {
+      return res.status(401).json({
         success: false,
-        message: "RSVP data is required",
+        message: "Gmail authentication required. Please contact administrator.",
       });
     }
 
-    // Format the email content
     const emailContent = formatRSVPForEmail(rsvpData);
     const subject = "RSVP Confirmation - Amber & Stephen's Wedding";
+    const fromEmail = process.env.GMAIL_FROM_EMAIL || "your-email@gmail.com"; // Set this to your Gmail
 
-    // Create the email message
-    const encodedMessage = createEmailMessage(to, subject, emailContent);
+    const raw = createEmailMessage(to, fromEmail, subject, emailContent);
 
-    // Send the email
     const response = await gmail.users.messages.send({
-      userId: "me", // This will use the service account email
-      requestBody: {
-        raw: encodedMessage,
-      },
+      userId: "me",
+      requestBody: { raw },
     });
 
-    console.log("Email sent successfully:", response.data);
+    console.log("✅ Email sent:", response.data);
     res.json({
       success: true,
       message: "Confirmation email sent successfully!",
       messageId: response.data.id,
     });
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("❌ Error sending email:", error);
 
-    // More specific error handling
-    if (error.code === 403) {
+    if (error.code === 401) {
+      res.status(401).json({
+        success: false,
+        message: "Gmail authentication expired. Please contact administrator.",
+      });
+    } else if (error.code === 403) {
       res.status(403).json({
         success: false,
-        message:
-          "Gmail API access denied. Please check your service account permissions.",
+        message: "Gmail API access denied. Check permissions.",
       });
     } else if (error.code === 400) {
       res.status(400).json({
@@ -276,6 +321,7 @@ app.post("/api/send-rsvp-email", async (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`✅ RSVP server running on port ${PORT}`);
+  console.log(`🔗 Authorization URL: http://localhost:${PORT}/auth/url`);
 });
 
 module.exports = app;

@@ -25,9 +25,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     return guests;
   };
 
-  // Show ALL guests now, not just attending ones
-  const allGuests = getAllGuests();
-  const attendingGuests = allGuests.filter(
+  const attendingGuests = getAllGuests().filter(
     (guest) => guest.welcomeParty || guest.weddingDay
   );
 
@@ -59,7 +57,10 @@ function ConfirmationPage({ setStep, guestRSVP }) {
         });
       }
 
-      // Include ALL guests now, not just attending ones
+      partyData.guests = partyData.guests.filter(
+        (guest) => guest.welcomeParty || guest.weddingDay
+      );
+
       if (partyData.guests.length > 0) {
         rsvpData.parties.push(partyData);
       }
@@ -100,13 +101,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
   };
 
   const handleBack = () => {
-    // If there are attending guests, go back to meal preferences
-    // If no one is attending, go back to guests attending
-    if (attendingGuests.length > 0) {
-      setStep("Meal preferences");
-    } else {
-      setStep("Guests attending");
-    }
+    setStep("Meal preferences");
   };
 
   return (
@@ -125,84 +120,46 @@ function ConfirmationPage({ setStep, guestRSVP }) {
         </p>
 
         <div style={{ maxWidth: 800, padding: "0 20px", marginTop: 10 }}>
-          <div
-            className={`guest-grid ${
-              allGuests.length === 1 ? "single-guest" : ""
-            }`}
-          >
-            {allGuests.map((guest, index) => {
-              const isAttending = guest.welcomeParty || guest.weddingDay;
+          <div className="guest-grid">
+            {attendingGuests.map((guest, index) => (
+              <div
+                key={`${guest.name}-${index}`}
+                className="guestCard"
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  width: 280,
+                }}
+              >
+                <h5 style={{ marginBottom: 15, fontWeight: 700, marginTop: 5 }}>
+                  {guest.name}
+                </h5>
+                <div style={{ marginBottom: 20 }}>
+                  <p style={{ marginBottom: 8, fontSize: 17, fontWeight: 700 }}>
+                    Attending Events:
+                  </p>
+                  <p style={{ fontSize: 16 }}>
+                    {[
+                      guest.weddingDay && "Wedding Day",
+                      guest.welcomeParty && "Welcome Party",
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                </div>
 
-              return (
-                <div
-                  key={`${guest.name}-${index}`}
-                  className="guestCard"
-                  style={{
-                    backgroundColor: isAttending ? "#f9f9f9" : "#f5f5f5",
-                    width: 280,
-                    border: isAttending ? "1px solid #ddd" : "1px solid #ccc",
-                  }}
-                >
-                  <h5
-                    style={{ marginBottom: 15, fontWeight: 700, marginTop: 5 }}
-                  >
-                    {guest.name}
-                  </h5>
-
+                {guest.weddingDay && (
                   <div style={{ marginBottom: 20 }}>
-                    <p
-                      style={{ marginBottom: 8, fontSize: 17, fontWeight: 700 }}
+                    <h6
+                      style={{
+                        marginBottom: 9,
+                        fontWeight: 700,
+                        fontSize: 17,
+                        color: "#555",
+                      }}
                     >
-                      Event Attendance
-                    </p>
-                    <p style={{ fontSize: 16, marginBottom: 5 }}>
-                      Welcome Party:{" "}
-                      {guest.welcomeParty ? "Attending" : "Not Attending"}
-                    </p>
-                    <p style={{ fontSize: 16 }}>
-                      Wedding Day:{" "}
-                      {guest.weddingDay ? "Attending" : "Not Attending"}
-                    </p>
-                  </div>
-
-                  {guest.weddingDay && (
-                    <div style={{ marginBottom: 20 }}>
-                      <h6
-                        style={{
-                          marginBottom: 9,
-                          fontWeight: 700,
-                          fontSize: 17,
-                          color: "#555",
-                        }}
-                      >
-                        Wedding Day Selections
-                      </h6>
-                      {guest.mealPreferences.entree && (
-                        <p
-                          style={{
-                            fontSize: 16,
-                            fontWeight: 500,
-                            marginBottom: 5,
-                          }}
-                        >
-                          Entree: {guest.mealPreferences.entree}
-                        </p>
-                      )}
-                      {guest.mealPreferences.cake && (
-                        <p style={{ fontSize: 16, fontWeight: 500 }}>
-                          Cake: {guest.mealPreferences.cake}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Only show dietary info for guests who provided it */}
-                  {(guest.mealPreferences.dietaryRestrictions !== undefined ||
-                    guest.mealPreferences.allergies !== undefined) && (
-                    <div style={{ marginBottom: -6 }}>
-                      <h6 style={{ fontWeight: 700, fontSize: 17 }}>
-                        Dietary Information
-                      </h6>
+                      Wedding Day Selections
+                    </h6>
+                    {guest.mealPreferences.entree && (
                       <p
                         style={{
                           fontSize: 16,
@@ -210,17 +167,31 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                           marginBottom: 5,
                         }}
                       >
-                        Dietary Restrictions:{" "}
-                        {guest.mealPreferences.dietaryRestrictions || "None"}
+                        Entree: {guest.mealPreferences.entree}
                       </p>
+                    )}
+                    {guest.mealPreferences.cake && (
                       <p style={{ fontSize: 16, fontWeight: 500 }}>
-                        Allergies: {guest.mealPreferences.allergies || "None"}
+                        Cake: {guest.mealPreferences.cake}
                       </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
+
+                <div style={{ marginBottom: -6 }}>
+                  <h6 style={{ fontWeight: 700, fontSize: 17 }}>
+                    Dietary Information
+                  </h6>
+                  <p style={{ fontSize: 16, fontWeight: 500, marginBottom: 5 }}>
+                    Dietary Restrictions:{" "}
+                    {guest.mealPreferences.dietaryRestrictions || "None"}
+                  </p>
+                  <p style={{ fontSize: 16, fontWeight: 500 }}>
+                    Allergies: {guest.mealPreferences.allergies || "None"}
+                  </p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
           <div

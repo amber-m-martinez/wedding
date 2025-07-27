@@ -7,8 +7,35 @@ function CompleteRSVP({ guestRSVP }) {
 
   const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [showEmailInput, setShowEmailInput] = useState(false);
 
-  // Check if any guest is attending any event
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const normalizeRSVPDataForEmail = (originalRSVP) => {
+    const parties = [];
+
+    Object.entries(originalRSVP).forEach(([partyName, party]) => {
+      const guestsArray = Object.values(party.guests || {});
+      const mealPreferences = party.mealPreferences || {};
+
+      parties.push({
+        partyName,
+        guests: guestsArray.map((guest) => ({
+          name: guest.name,
+          welcomeParty: guest.welcomeParty,
+          weddingDay: guest.weddingDay,
+        })),
+        mealPreferences,
+      });
+    });
+
+    return { parties };
+  };
+
   const hasAttendingGuests = () => {
     return Object.keys(guestRSVP).some((partyName) => {
       const party = guestRSVP[partyName];
@@ -58,62 +85,64 @@ function CompleteRSVP({ guestRSVP }) {
 
   const rsvpSummary = formatRSVPForDisplay();
 
-  const sendConfirmationEmail = async () => {
-    // Prompt user for email if not already collected
-    const email = prompt(
-      "Please enter your email address for the confirmation:"
-    );
+  const handleEmailButtonClick = () => {
+    setShowEmailInput(true);
+  };
 
-    if (!email) {
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!trimmedEmail) {
       alert("Email address is required to send confirmation.");
       return;
     }
 
+    if (!isValidEmail(trimmedEmail)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    await sendConfirmationEmail(trimmedEmail);
+  };
+
+  const sendConfirmationEmail = async (emailAddress) => {
     setSendingEmail(true);
 
+    const rsvpDataForEmail = normalizeRSVPDataForEmail(guestRSVP);
+
     try {
-      console.log("Sending email to:", email);
-      console.log("RSVP data:", guestRSVP);
-
-      const response = await fetch("/api/send-rsvp-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: email,
-          rsvpData: guestRSVP,
-        }),
-      });
-
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
+      const response = await fetch(
+        "https://wedding-r3hc.onrender.com/api/send-rsvp-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            to: emailAddress,
+            rsvpData: rsvpDataForEmail,
+          }),
+        }
+      );
 
       const result = await response.json();
-      console.log("Response result:", result);
 
       if (response.ok && result.success) {
         setEmailSent(true);
+        setShowEmailInput(false);
       } else {
-        throw new Error(result.message || "Failed to send email");
+        throw new Error(
+          result.message || result.error || "Email sending failed"
+        );
       }
     } catch (error) {
-      console.error("Full error details:", error);
-
-      // More detailed error message
-      if (error.name === "TypeError" && error.message.includes("fetch")) {
-        alert(
-          "Cannot connect to server. Please check if the server is running."
-        );
-      } else if (error.message.includes("404")) {
-        alert(
-          "Email endpoint not found. The server may not have the email functionality set up yet."
-        );
-      } else {
-        alert(
-          `Error sending email: ${error.message}. Please save this page or take a screenshot for your records.`
-        );
-      }
+      console.error("Error sending email:", error);
+      alert(
+        `Error sending email: ${error.message}\n\nPlease save this page or take a screenshot for your records.`
+      );
     } finally {
       setSendingEmail(false);
     }
@@ -147,7 +176,6 @@ function CompleteRSVP({ guestRSVP }) {
           </p>
         </div>
 
-        {/* RSVP Summary Display */}
         {anyoneAttending && (
           <div
             style={{
@@ -198,37 +226,19 @@ function CompleteRSVP({ guestRSVP }) {
                   ))}
                 </div>
 
-                {Object.keys(party.mealPreferences).length > 0 && (
-                  <div style={{ marginLeft: 10 }}>
-                    <strong>Meal Preferences:</strong>
-                    {Object.entries(party.mealPreferences).map(
-                      ([guestName, prefs]) => (
-                        <div
-                          key={guestName}
-                          style={{ marginLeft: 10, marginBottom: 8 }}
-                        >
-                          <p style={{ margin: "2px 0", fontWeight: "500" }}>
-                            {guestName}
-                          </p>
-                          <p
-                            style={{
-                              margin: "2px 0",
-                              fontSize: 14,
-                              color: "#666",
-                            }}
+                {party.mealPreferences &&
+                  Object.keys(party.mealPreferences).length > 0 && (
+                    <div style={{ marginLeft: 10 }}>
+                      <strong>Meal Preferences:</strong>
+                      {Object.entries(party.mealPreferences).map(
+                        ([guestName, prefs]) => (
+                          <div
+                            key={guestName}
+                            style={{ marginLeft: 10, marginBottom: 8 }}
                           >
-                            Entree: {prefs.entree || "Not specified"}
-                          </p>
-                          <p
-                            style={{
-                              margin: "2px 0",
-                              fontSize: 14,
-                              color: "#666",
-                            }}
-                          >
-                            Cake: {prefs.cake || "Not specified"}
-                          </p>
-                          {prefs.dietaryRestrictions && (
+                            <p style={{ margin: "2px 0", fontWeight: "500" }}>
+                              {guestName}
+                            </p>
                             <p
                               style={{
                                 margin: "2px 0",
@@ -236,10 +246,8 @@ function CompleteRSVP({ guestRSVP }) {
                                 color: "#666",
                               }}
                             >
-                              Dietary Restrictions: {prefs.dietaryRestrictions}
+                              Entree: {prefs.entree || "Not specified"}
                             </p>
-                          )}
-                          {prefs.allergies && (
                             <p
                               style={{
                                 margin: "2px 0",
@@ -247,38 +255,120 @@ function CompleteRSVP({ guestRSVP }) {
                                 color: "#666",
                               }}
                             >
-                              Allergies: {prefs.allergies}
+                              Cake: {prefs.cake || "Not specified"}
                             </p>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </div>
-                )}
+                            {prefs.dietaryRestrictions && (
+                              <p
+                                style={{
+                                  margin: "2px 0",
+                                  fontSize: 14,
+                                  color: "#666",
+                                }}
+                              >
+                                Dietary Restrictions:{" "}
+                                {prefs.dietaryRestrictions}
+                              </p>
+                            )}
+                            {prefs.allergies && (
+                              <p
+                                style={{
+                                  margin: "2px 0",
+                                  fontSize: 14,
+                                  color: "#666",
+                                }}
+                              >
+                                Allergies: {prefs.allergies}
+                              </p>
+                            )}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
               </div>
             ))}
           </div>
         )}
 
-        {/* Email Confirmation Section */}
         <div style={{ textAlign: "center" }}>
           {!emailSent ? (
-            <button
-              onClick={sendConfirmationEmail}
-              disabled={sendingEmail}
-              style={{
-                backgroundColor: "#2d5016",
-                color: "white",
-                border: "none",
-                padding: "12px 24px",
-                borderRadius: 6,
-                fontSize: 16,
-                cursor: sendingEmail ? "not-allowed" : "pointer",
-                opacity: sendingEmail ? 0.6 : 1,
-              }}
-            >
-              {sendingEmail ? "Sending..." : "Email Me a Confirmation"}
-            </button>
+            <>
+              {!showEmailInput ? (
+                <button
+                  onClick={handleEmailButtonClick}
+                  style={{
+                    backgroundColor: "#2d5016",
+                    color: "white",
+                    border: "none",
+                    padding: "12px 24px",
+                    borderRadius: 6,
+                    fontSize: 16,
+                    cursor: "pointer",
+                  }}
+                >
+                  Email Me a Confirmation
+                </button>
+              ) : (
+                <form
+                  onSubmit={handleEmailSubmit}
+                  style={{ display: "inline-block" }}
+                >
+                  <div style={{ marginBottom: 10 }}>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      required
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 4,
+                        border: "1px solid #ccc",
+                        fontSize: 14,
+                        width: "250px",
+                        marginRight: 10,
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <button
+                      type="submit"
+                      disabled={sendingEmail}
+                      style={{
+                        backgroundColor: "#2d5016",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: 4,
+                        fontSize: 14,
+                        cursor: sendingEmail ? "not-allowed" : "pointer",
+                        opacity: sendingEmail ? 0.6 : 1,
+                        marginRight: 8,
+                      }}
+                    >
+                      {sendingEmail ? "Sending..." : "Send"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailInput(false)}
+                      disabled={sendingEmail}
+                      style={{
+                        backgroundColor: "#6c757d",
+                        color: "white",
+                        border: "none",
+                        padding: "8px 16px",
+                        borderRadius: 4,
+                        fontSize: 14,
+                        cursor: sendingEmail ? "not-allowed" : "pointer",
+                        opacity: sendingEmail ? 0.6 : 1,
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
+            </>
           ) : (
             <div
               style={{

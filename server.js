@@ -260,8 +260,6 @@ function formatRSVPForEmail(rsvpData) {
   // NEW SECTION FOR NON-ATTENDING GUESTS
   if (guestsNotAttending.length > 0) {
     htmlContent += `
-      <div style="margin-bottom: 30px;">
-        <h3 style="font-size: 18px; color: #333; margin: 0 0 20px; font-weight: bold;">Guests Not Attending</h3>
         ${guestsNotAttending
           .map(
             (guest) => `
@@ -272,7 +270,6 @@ function formatRSVPForEmail(rsvpData) {
           `
           )
           .join("")}
-      </div>
     `;
   }
 

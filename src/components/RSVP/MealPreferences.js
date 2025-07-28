@@ -29,7 +29,6 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
     });
   }, [allGuests]);
 
-  // NEW: Define the list of child guests
   const childGuests = useMemo(
     () =>
       new Set([
@@ -46,7 +45,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
       { name: "Grilled Hanger Steak", description: "GF, dairy" },
       { name: "Roasted Chicken Breast", description: "GF, dairy" },
       { name: "Roasted Eggplant", description: "GF, vegan" },
-      { name: "Chicken Fingers", description: "Kid-friendly" },
+      { name: "Chicken Fingers", description: "Children's meal" },
     ],
     []
   );

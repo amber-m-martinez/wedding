@@ -253,7 +253,7 @@ function formatRSVPForEmail(rsvpData) {
       <div style="margin: 40px 0;">
         <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Welcome Party</h3>
         <p style="margin: 4px 0; font-size: 16px">Thursday, October 23rd, 2025</p>
-        <p style="margin: 4px 0; font-size: 16px">Clover Club – 210 Smith St, Brooklyn, NY 11201</p>
+        <p style="margin: 4px 0; font-size: 16px">Clover Club – <a href="https://maps.app.goo.gl/swFgyYSkyL5UdSKWA" style="color: #555;">210 Smith St, Brooklyn, NY 11201</a></p>
         <p style="margin: 4px 0; font-size: 16px">5–7pm | Attire: <a href="${attireLink}" style="color: #555;">Elevated Smart Casual</a></p>
         <p style="margin: 4px 0; font-size: 16px">Join us for drinks and mingling in a cozy, cocktail-style setting.</p>
       </div>`;
@@ -269,8 +269,8 @@ function formatRSVPForEmail(rsvpData) {
         <p style="margin: 4px 0; font-size: 16px">5:30pm Ceremony by the Lullwater (outdoors)</p>
         <p style="margin: 4px 0; font-size: 16px">6:00pm Cocktails & hors d'oeuvres on the terrace</p>
         <p style="margin: 4px 0; font-size: 16px">7:00pm Dinner inside the Boathouse</p>
-        <img src="${baseUrl}/images/boathouse-event-map.png" alt="Boathouse Directions" style="width: 100%; max-width: 500px; border-radius: 8px; margin-top: 10px;" />
-        <p style="margin-top: 10px; font-size: 15px; color: #777;">Note: The Boathouse is not accessible by car. Use the designated drop‑off point and follow pedestrian-only paths. Staff will guide you. Parking is available along Willink Drive if needed.</p>
+        <img src="${baseUrl}/images/boathouse-event-map.png" alt="Boathouse Directions" style="width: 100%; border-radius: 8px; margin-top: 19px;" />
+        <p style="margin-top: 19px; text-align: center; font-size: 16px; color: #777;">Note: The Boathouse is not accessible by car. Use the designated drop‑off point and follow pedestrian-only paths. Staff will guide you. Parking is available along Willink Drive if needed.</p>
       </div>`;
     }
   }

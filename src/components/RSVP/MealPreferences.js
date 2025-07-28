@@ -45,7 +45,8 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
     () => [
       { name: "Grilled Hanger Steak", description: "GF, dairy" },
       { name: "Roasted Chicken Breast", description: "GF, dairy" },
-      { name: "Chicken Fingers", description: "Kid-friendly" }, // Added Chicken Fingers
+      { name: "Roasted Eggplant", description: "GF, vegan" },
+      { name: "Chicken Fingers", description: "Kid-friendly" },
     ],
     []
   );

@@ -53,6 +53,9 @@ function GuestsAttending({
         "Claire Gensheimer",
         "Jack Gensheimer",
       ],
+      "Laura Cáceres": ["Maxime Lecaplain", "Mia Lecaplain Cáceres"],
+      "Ingrid Lapaix": ["Luis Baez", "Ana Elisa De Los Santos"],
+      "Lizzie Pradel": ["Amadi Martinez"],
     }),
     []
   );
@@ -348,7 +351,7 @@ function GuestsAttending({
                         fontWeight: 500,
                       }}
                     >
-                      Welcome Drinks
+                      Welcome Party
                     </p>
                     <div style={{ display: "flex", gap: 10 }}>
                       <button

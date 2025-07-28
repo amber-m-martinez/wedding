@@ -52,16 +52,16 @@ function WelcomeDrinksAttire() {
           className="responsive-align"
           style={{ fontSize: 25, fontWeight: 700 }}
         >
-          Welcome Drinks: Elevated Smart Casual
+          Welcome Party: Elevated Smart Casual
         </p>
         <p
           className="responsive-align"
           style={{ fontSize: 18, marginTop: -10 }}
         >
-          The welcome drinks attire is Elevated Smart Casual. Dressy but
-          relaxed! Think trousers or chinos with a nice shirt or sweater, and
-          stylish dresses, skirts, or polished pants. Jackets and ties are not
-          required. Please no jeans or athletic shoes. <br />
+          The welcome party attire is Elevated Smart Casual. Dressy but relaxed!
+          Think trousers or chinos with a nice shirt or sweater, and stylish
+          dresses, skirts, or polished pants. Jackets and ties are not required.
+          Please no jeans or athletic shoes. <br />
           You may see examples/inspiration for the attire below.
         </p>
       </div>

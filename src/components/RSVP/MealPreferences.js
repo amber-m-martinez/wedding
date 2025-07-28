@@ -11,7 +11,6 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
     const guests = [];
     // CRITICAL FIX: Ensure guestRSVP is an object before calling Object.keys
     Object.keys(guestRSVP || {}).forEach((partyName) => {
-      // <-- Changed here
       const party = guestRSVP[partyName];
       if (party.guests) {
         Object.values(party.guests).forEach((guest) => {
@@ -30,10 +29,23 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
     });
   }, [allGuests]);
 
+  // NEW: Define the list of child guests
+  const childGuests = useMemo(
+    () =>
+      new Set([
+        "Claire Gensheimer",
+        "Jack Gensheimer",
+        "Mia Lecaplain Cáceres",
+        "Amadi Martinez",
+      ]),
+    []
+  );
+
   const entreeOptions = useMemo(
     () => [
       { name: "Grilled Hanger Steak", description: "GF, dairy" },
       { name: "Roasted Chicken Breast", description: "GF, dairy" },
+      { name: "Chicken Fingers", description: "Kid-friendly" }, // Added Chicken Fingers
     ],
     []
   );
@@ -88,31 +100,51 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
     [getGuestUniqueId]
   );
 
+  // Effect to automatically select "Chicken Fingers" for child guests when they load
+  useEffect(() => {
+    setMealSelections((prevSelections) => {
+      const newSelections = { ...prevSelections };
+      attendingGuests.forEach((guest) => {
+        if (childGuests.has(guest.name) && guest.weddingDay) {
+          // Only if attending wedding day
+          const guestId = getGuestUniqueId(guest);
+          if (
+            !newSelections[guestId] ||
+            newSelections[guestId].entree !== "Chicken Fingers"
+          ) {
+            newSelections[guestId] = {
+              ...newSelections[guestId],
+              entree: "Chicken Fingers",
+            };
+          }
+        }
+      });
+      return newSelections;
+    });
+  }, [attendingGuests, childGuests, getGuestUniqueId]);
+
   const allRequiredFieldsCompleted = useMemo(() => {
-    // console.log("--- Checking allRequiredFieldsCompleted ---");
     const isComplete = attendingGuests.every((guest) => {
       const guestId = getGuestUniqueId(guest);
       const selections = mealSelections[guestId];
-
-      // console.log(`Guest: ${guest.name}, ID: ${guestId}`);
-      // console.log("Current Selections for this guest:", selections);
 
       let guestComplete = true; // Assume complete by default
 
       // Only check for entree and cake if the guest is attending the wedding day
       if (guest.weddingDay === true) {
-        guestComplete = !!selections?.entree && !!selections?.cake;
-        // console.log(`  ${guest.name} (Wedding Day): Entree: ${!!selections?.entree}, Cake: ${!!selections?.cake} => ${guestComplete}`);
-      } else {
-        // console.log(`  ${guest.name} (Welcome Party Only): No required fields, assuming true.`);
+        // If it's a child guest, just check if entree is 'Chicken Fingers'
+        if (childGuests.has(guest.name)) {
+          guestComplete =
+            selections?.entree === "Chicken Fingers" && !!selections?.cake;
+        } else {
+          // For adult guests, check any entree and cake
+          guestComplete = !!selections?.entree && !!selections?.cake;
+        }
       }
-
       return guestComplete;
     });
-
-    // console.log("Overall completion status:", isComplete);
     return isComplete;
-  }, [attendingGuests, mealSelections, getGuestUniqueId]);
+  }, [attendingGuests, mealSelections, getGuestUniqueId, childGuests]); // Added childGuests to dependencies
 
   const handleNext = useCallback(() => {
     setGuestRSVP((prev) => {
@@ -184,6 +216,13 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
           >
             {attendingGuests.map((guest) => {
               const guestId = getGuestUniqueId(guest);
+              const isChild = childGuests.has(guest.name); // Check if current guest is a child
+
+              // Determine which entree options to display
+              const currentEntreeOptions = isChild
+                ? entreeOptions.filter((opt) => opt.name === "Chicken Fingers")
+                : entreeOptions.filter((opt) => opt.name !== "Chicken Fingers"); // Filter out chicken fingers for adults
+
               return (
                 <div key={guestId} className="guestCard mealPreferences">
                   <h5 style={{ marginBottom: 0, fontWeight: 700 }}>
@@ -194,7 +233,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
                       Attending:{" "}
                       {[
                         guest.weddingDay && "Wedding Day",
-                        guest.welcomeParty && "Welcome Drinks",
+                        guest.welcomeParty && "Welcome Party",
                       ]
                         .filter(Boolean)
                         .join(", ")}
@@ -231,49 +270,53 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
                             gap: 8,
                           }}
                         >
-                          {entreeOptions.map((entree) => (
-                            <label
-                              key={entree.name}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                                cursor: "pointer",
-                                userSelect: "none",
-                              }}
-                            >
-                              <input
-                                type="radio"
+                          {currentEntreeOptions.map(
+                            (
+                              entree // Use currentEntreeOptions here
+                            ) => (
+                              <label
+                                key={entree.name}
                                 style={{
-                                  accentColor: "#ffdee8",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 8,
+                                  cursor: "pointer",
+                                  userSelect: "none",
                                 }}
-                                name={`${guestId}-entree`}
-                                checked={
-                                  mealSelections[guestId]?.entree ===
-                                  entree.name
-                                }
-                                onChange={() =>
-                                  handleMealSelection(
-                                    guest,
-                                    "entree",
-                                    entree.name
-                                  )
-                                }
-                              />
-                              <span>
-                                {entree.name}{" "}
-                                <span
+                              >
+                                <input
+                                  type="radio"
                                   style={{
-                                    fontSize: 14,
-                                    color: "#666",
-                                    fontStyle: "italic",
+                                    accentColor: "#ffdee8",
                                   }}
-                                >
-                                  {entree.description}
+                                  name={`${guestId}-entree`}
+                                  checked={
+                                    mealSelections[guestId]?.entree ===
+                                    entree.name
+                                  }
+                                  onChange={() =>
+                                    handleMealSelection(
+                                      guest,
+                                      "entree",
+                                      entree.name
+                                    )
+                                  }
+                                />
+                                <span>
+                                  {entree.name}{" "}
+                                  <span
+                                    style={{
+                                      fontSize: 14,
+                                      color: "#666",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    {entree.description}
+                                  </span>
                                 </span>
-                              </span>
-                            </label>
-                          ))}
+                              </label>
+                            )
+                          )}
                         </div>
                       </div>
 

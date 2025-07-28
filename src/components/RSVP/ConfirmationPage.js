@@ -214,12 +214,10 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                               fontSize: 14,
                             }}
                           >
-                            (
                             {getDescription(
                               entreeOptions,
                               guest.mealPreferences.entree
                             )}
-                            )
                           </span>
                         )}
                       </p>
@@ -239,12 +237,10 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                               fontSize: 14,
                             }}
                           >
-                            (
                             {getDescription(
                               cakeOptions,
                               guest.mealPreferences.cake
                             )}
-                            )
                           </span>
                         )}
                       </p>

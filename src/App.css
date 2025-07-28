@@ -500,6 +500,17 @@ input[type="checkbox"]:hover {
   margin-bottom: 120px;
 }
 
+.buttonsContainer {
+  max-width: 800px;
+  margin-top: 30px;
+  margin-bottom: 120px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+  width: 100%;
+}
+
 @media (max-width: 990px) {
   .responsive-align {
     text-align: center;
@@ -679,11 +690,13 @@ input[type="checkbox"]:hover {
     justify-self: center;
     width: 100%;
     margin-top: 10px;
+    padding: 5px 9px;
   }
 
   .backButton {
     width: 100%;
     margin-top: 10px;
+    padding: 5px 9px;
   }
 
   .mealPreferencesButtonContainer {
@@ -696,6 +709,12 @@ input[type="checkbox"]:hover {
     right: unset;
     transform: translateX(-50%);
     margin-top: 15px;
+  }
+
+  .buttonsContainer {
+    width: 100%;
+    padding: 0px 66px;
+    justify-content: space-evenly;
   }
 }
 

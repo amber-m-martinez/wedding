@@ -7,7 +7,6 @@ function ConfirmationPage({ setStep, guestRSVP }) {
 
   useScrollToHeader(60);
 
-  // Define entree and cake options with descriptions (same as in MealPreferences)
   const entreeOptions = [
     { name: "Grilled Hanger Steak", description: "GF, dairy" },
     { name: "Roasted Chicken Breast", description: "GF, dairy" },
@@ -21,7 +20,6 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     { name: "Vanilla & Raspberry Jam", description: "GF, vegan" },
   ];
 
-  // Helper to get description by name
   const getDescription = (options, name) => {
     const option = options.find((opt) => opt.name === name);
     return option ? option.description : "";
@@ -45,9 +43,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
     return guests;
   };
 
-  const attendingGuests = getAllGuests().filter(
-    (guest) => guest.welcomeParty || guest.weddingDay
-  );
+  const allGuests = getAllGuests();
 
   const prepareRSVPData = () => {
     const rsvpData = {
@@ -121,7 +117,15 @@ function ConfirmationPage({ setStep, guestRSVP }) {
   };
 
   const handleBack = () => {
-    setStep("Meal preferences");
+    const hasAttendingGuests = allGuests.some(
+      (guest) => guest.weddingDay || guest.welcomeParty
+    );
+
+    if (hasAttendingGuests) {
+      setStep("Meal preferences");
+    } else {
+      setStep("Guests attending");
+    }
   };
 
   return (
@@ -139,16 +143,26 @@ function ConfirmationPage({ setStep, guestRSVP }) {
           Please review your RSVP details below.
         </p>
 
-        <div style={{ maxWidth: 800, padding: "0 20px", marginTop: 10 }}>
-          <div className="guest-grid">
-            {attendingGuests.map((guest, index) => (
+        {/* Guest cards */}
+        <div
+          className="cards-container"
+          style={{
+            maxWidth: 800,
+            marginTop: 10,
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 20,
+          }}
+        >
+          {allGuests.map((guest, index) => {
+            const attendingAny = guest.weddingDay || guest.welcomeParty;
+
+            return (
               <div
                 key={`${guest.name}-${index}`}
                 className="guestCard"
-                style={{
-                  backgroundColor: "#f9f9f9",
-                  width: 350,
-                }}
+                style={{ backgroundColor: "#f9f9f9", width: 350 }}
               >
                 <h5 style={{ marginBottom: 15, fontWeight: 700, marginTop: 5 }}>
                   {guest.name}
@@ -158,12 +172,14 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                     Attending Events:
                   </p>
                   <p style={{ fontSize: 16 }}>
-                    {[
-                      guest.weddingDay && "Wedding Day",
-                      guest.welcomeParty && "Welcome Party",
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
+                    {attendingAny
+                      ? [
+                          guest.weddingDay && "Wedding Day",
+                          guest.welcomeParty && "Welcome Party",
+                        ]
+                          .filter(Boolean)
+                          .join(", ")
+                      : "Not attending any events"}
                   </p>
                 </div>
 
@@ -237,46 +253,58 @@ function ConfirmationPage({ setStep, guestRSVP }) {
                   </div>
                 )}
 
-                <div style={{ marginBottom: 10 }}>
-                  <h6
-                    style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}
-                  >
-                    Dietary Information
-                  </h6>
-                  <p style={{ fontSize: 16, marginBottom: 5 }}>
-                    Dietary Restrictions:{" "}
-                    {guest.mealPreferences.dietaryRestrictions || "None"}
-                  </p>
-                  <p style={{ fontSize: 16 }}>
-                    Allergies: {guest.mealPreferences.allergies || "None"}
-                  </p>
-                </div>
+                {attendingAny && (
+                  <div style={{ marginBottom: 10 }}>
+                    <h6
+                      style={{
+                        fontWeight: 700,
+                        fontSize: 16,
+                        marginBottom: 8,
+                      }}
+                    >
+                      Dietary Information
+                    </h6>
+                    <p style={{ fontSize: 16, marginBottom: 5 }}>
+                      Dietary Restrictions:{" "}
+                      {guest.mealPreferences.dietaryRestrictions || "None"}
+                    </p>
+                    <p style={{ fontSize: 16 }}>
+                      Allergies: {guest.mealPreferences.allergies || "None"}
+                    </p>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+            );
+          })}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: 30,
-              marginBottom: 120,
-            }}
-          >
-            <div>
-              <button onClick={handleBack} className="backButton">
-                ← Back
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={sendRSVPToGoogleSheet}
-                disabled={isSubmitting}
-                className="completeRSVPButton"
-              >
-                {isSubmitting ? "Submitting..." : "Complete RSVP →"}
-              </button>
-            </div>
+          {/* Buttons container */}
+          <div className="buttonsContainer">
+            <button
+              onClick={handleBack}
+              className="backButton"
+              style={{
+                borderRadius: 6,
+                cursor: "pointer",
+                width: "auto",
+                margin: 0,
+              }}
+            >
+              ← Back
+            </button>
+            <button
+              onClick={sendRSVPToGoogleSheet}
+              disabled={isSubmitting}
+              className="completeRSVPButton"
+              style={{
+                // padding: "10px 20px",
+                borderRadius: 6,
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                width: "auto",
+                margin: 0,
+              }}
+            >
+              {isSubmitting ? "Submitting..." : "Complete RSVP →"}
+            </button>
           </div>
         </div>
       </div>

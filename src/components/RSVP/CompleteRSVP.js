@@ -185,6 +185,7 @@ function CompleteRSVP({ guestRSVP }) {
             borderRadius: 4,
             marginBottom: 25,
             color: "#2d5016",
+            width: "370px",
           }}
         >
           <h5 style={{ marginBottom: 10 }}>RSVP Successfully Submitted!</h5>
@@ -217,7 +218,7 @@ function CompleteRSVP({ guestRSVP }) {
                         exit={{ opacity: 1 }}
                         transition={{ duration: 0.3, exit: { duration: 0 } }}
                         onClick={handleEmailButtonClick}
-                        style={{ marginTop: 19 }}
+                        style={{ marginTop: 19, width: "auto" }}
                         className="emailConfirmation"
                       >
                         Email me a confirmation

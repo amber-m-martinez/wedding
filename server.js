@@ -158,7 +158,7 @@ function formatRSVPForEmail(rsvpData) {
 <body style="margin: 0; padding: 0;">
   <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 40px 30px;">
     <div style="text-align: center; margin-bottom: 30px;">
-      <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 150px; height: auto;" />
+      <img src="${logoUrl}" alt="Amber & Stephen" style="max-width: 140px; height: auto;" />
     </div>
     <div style="margin-bottom: 30px;">
       <p style="font-size: 18px; color: #333;">Dear ${firstGuestName},</p>
@@ -175,25 +175,16 @@ function formatRSVPForEmail(rsvpData) {
 `;
 
   if (guestsAttending.length > 0) {
-    // Changed condition to use guestsAttending
     htmlContent += `
-      <div style="margin-bottom: 30px;">
+      <div style="margin-bottom: 20px;">
         <h3 style="font-size: 18px; color: #333; margin: 0 0 20px; font-weight: bold;">Guest Summary</h3>
-        ${guestsAttending // Iterate over guestsAttending here
+        ${guestsAttending
           .map((guest) => {
             const prefs =
               rsvpData.parties.find((p) => p.partyName === guest.partyName)
                 ?.mealPreferences?.[guest.name] || {};
 
-            const entreeLabel = prefs.entree || "Not specified";
-            const cakeLabel = prefs.cake || "Not specified";
-
-            // Note: Your frontend collected individual boolean dietary tags,
-            // but your backend's formatRSVPForEmail is expecting `prefs.dietaryRestrictions` and `prefs.allergies` as strings.
-            // If your frontend sends individual booleans, you'll need to reconstruct the string here.
-            // For now, I'm assuming prefs.dietaryRestrictions and prefs.allergies are strings.
-            const dietaryTags = []; // This part seems to be for boolean flags, but your data structure looks like it sends strings.
-            // I'll keep it as is, but be aware of the potential mismatch if your frontend sends booleans.
+            const dietaryTags = [];
             if (prefs.vegan) dietaryTags.push("Vegan");
             if (prefs.vegetarian) dietaryTags.push("Vegetarian");
             if (prefs.glutenFree) dietaryTags.push("Gluten Free");
@@ -206,32 +197,42 @@ function formatRSVPForEmail(rsvpData) {
                 guest.name
               }</p>
               <p style="margin: 4px 0; font-size: 15px;">Events: ${
-                !guest.welcomeParty && !guest.weddingDay // This conditional is technically redundant now because we're filtering for attending guests
+                !guest.welcomeParty && !guest.weddingDay
                   ? "Not Attending"
                   : `${guest.welcomeParty ? "Welcome Party" : ""}${
                       guest.welcomeParty && guest.weddingDay ? ", " : ""
                     }${guest.weddingDay ? "Wedding Day" : ""}`
               }</p>
-              <p style="margin: 4px 0; font-size: 15px;">Entree: ${entreeLabel}
-                ${
-                  entreeLabel !== "Not specified"
-                    ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
-                        entreeLabel,
-                        "entree"
-                      )}</span>`
-                    : ""
-                }
-              </p>
-              <p style="margin: 4px 0; font-size: 15px;">Cake: ${cakeLabel}
-                ${
-                  cakeLabel !== "Not specified"
-                    ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
-                        cakeLabel,
-                        "cake"
-                      )}</span>`
-                    : ""
-                }
-              </p>
+              ${
+                guest.weddingDay // Only show entree and cake if attending weddingDay
+                  ? `
+                  <p style="margin: 4px 0; font-size: 15px;">Entree: ${
+                    prefs.entree || "Not specified"
+                  }
+                    ${
+                      prefs.entree
+                        ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
+                            prefs.entree,
+                            "entree"
+                          )}</span>`
+                        : ""
+                    }
+                  </p>
+                  <p style="margin: 4px 0; font-size: 15px;">Cake: ${
+                    prefs.cake || "Not specified"
+                  }
+                    ${
+                      prefs.cake
+                        ? `<span style="font-style: italic; font-size: 13px; color: #777; margin-left: 6px;">${getMealDescription(
+                            prefs.cake,
+                            "cake"
+                          )}</span>`
+                        : ""
+                    }
+                  </p>
+                `
+                  : ""
+              }
               ${
                 prefs.dietaryRestrictions
                   ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Restrictions: ${prefs.dietaryRestrictions}</p>`

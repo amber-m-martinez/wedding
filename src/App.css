@@ -389,7 +389,7 @@ input[type="checkbox"]:hover {
 }
 
 .guestCard {
-  width: 100%;
+  width: 320px;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;

@@ -199,7 +199,10 @@ function CompleteRSVP({ guestRSVP }) {
             style={{
               textAlign: "center",
               marginBottom: 5,
-              justifySelf: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <AnimatePresence mode="wait">
@@ -209,6 +212,12 @@ function CompleteRSVP({ guestRSVP }) {
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 1 }}
                   transition={{ duration: 0 }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
                 >
                   <AnimatePresence mode="wait">
                     {!showEmailInput ? (
@@ -235,11 +244,19 @@ function CompleteRSVP({ guestRSVP }) {
                           maxWidth: "400px",
                           margin: "0 auto",
                           marginTop: 10,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
                         }}
                       >
                         <p>Share your email address:</p>
-                        <form onSubmit={handleEmailSubmit}>
-                          <div style={{ marginBottom: 0 }}>
+                        <form
+                          onSubmit={handleEmailSubmit}
+                          style={{ width: "100%" }}
+                        >
+                          <div
+                            style={{ marginBottom: 10, textAlign: "center" }}
+                          >
                             <input
                               type="email"
                               value={email}
@@ -253,16 +270,15 @@ function CompleteRSVP({ guestRSVP }) {
                                 fontSize: 14,
                                 width: 260,
                                 boxSizing: "border-box",
-                                marginBottom: -5,
                               }}
                             />
                           </div>
                           <div
                             style={{
                               display: "flex",
-                              justifyContent: "space-between",
-                              gap: 45,
-                              marginTop: 0,
+                              justifyContent: "center",
+                              gap: 10,
+                              marginTop: 10,
                             }}
                           >
                             <button
@@ -273,14 +289,14 @@ function CompleteRSVP({ guestRSVP }) {
                                 backgroundColor: "#2d5016",
                                 color: "white",
                                 border: "none",
-                                padding: "10px 0px",
+                                padding: "10px 20px",
                                 borderRadius: 4,
                                 fontSize: 14,
                                 cursor: sendingEmail
                                   ? "not-allowed"
                                   : "pointer",
                                 opacity: sendingEmail ? 0.6 : 1,
-                                flex: 1,
+                                minWidth: 80,
                               }}
                             >
                               {sendingEmail ? "Sending..." : "Send"}
@@ -294,14 +310,14 @@ function CompleteRSVP({ guestRSVP }) {
                                 backgroundColor: "#6c757d",
                                 color: "white",
                                 border: "none",
-                                padding: "10px 0px",
+                                padding: "10px 20px",
                                 borderRadius: 4,
                                 fontSize: 14,
                                 cursor: sendingEmail
                                   ? "not-allowed"
                                   : "pointer",
                                 opacity: sendingEmail ? 0.6 : 1,
-                                flex: 1,
+                                minWidth: 80,
                               }}
                             >
                               Cancel

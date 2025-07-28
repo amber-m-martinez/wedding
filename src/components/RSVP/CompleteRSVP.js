@@ -186,6 +186,7 @@ function CompleteRSVP({ guestRSVP }) {
             marginBottom: 25,
             color: "#2d5016",
             width: "370px",
+            alignSelf: "center",
           }}
         >
           <h5 style={{ marginBottom: 10 }}>RSVP Successfully Submitted!</h5>

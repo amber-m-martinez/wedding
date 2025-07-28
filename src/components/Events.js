@@ -22,10 +22,10 @@ function Events() {
         <div style={{ maxWidth: 900, width: "100%" }}>
           <p className="eventName">
             <span className="desktop-only">
-              Welcome Drinks – Thursday, October 23rd, 2025
+              Welcome Party – Thursday, October 23rd, 2025
             </span>
             <span className="mobile-only">
-              Welcome Drinks
+              Welcome Party
               <br />
               Thursday, October 23rd, 2025
             </span>

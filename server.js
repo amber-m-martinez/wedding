@@ -234,20 +234,27 @@ function formatRSVPForEmail(rsvpData) {
                   : ""
               }
               ${
-                prefs.dietaryRestrictions
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Restrictions: ${prefs.dietaryRestrictions}</p>`
-                  : ""
-              }
-              ${
-                prefs.allergies
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Allergies: ${prefs.allergies}</p>`
-                  : ""
-              }
-              ${
-                dietaryTags.length > 0
-                  ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Preferences: ${dietaryTags.join(
-                      ", "
-                    )}</p>`
+                // Display dietary restrictions/allergies if attending either event
+                guest.welcomeParty || guest.weddingDay
+                  ? `
+                ${
+                  prefs.dietaryRestrictions
+                    ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Restrictions: ${prefs.dietaryRestrictions}</p>`
+                    : ""
+                }
+                ${
+                  prefs.allergies
+                    ? `<p style="margin: 4px 0; font-size: 15px;">Allergies: ${prefs.allergies}</p>`
+                    : ""
+                }
+                ${
+                  dietaryTags.length > 0
+                    ? `<p style="margin: 4px 0; font-size: 15px;">Dietary Preferences: ${dietaryTags.join(
+                        ", "
+                      )}</p>`
+                    : ""
+                }
+              `
                   : ""
               }
             </div>
@@ -264,7 +271,7 @@ function formatRSVPForEmail(rsvpData) {
         ${guestsNotAttending
           .map(
             (guest) => `
-            <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #f9f9f9;">
+            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #f9f9f9;">
               <p style="margin: 0 0 6px; font-size: 16px; font-weight: 600;">${guest.name}</p>
               <p style="margin: 4px 0; font-size: 15px; color: #777;">Not attending any events.</p>
             </div>

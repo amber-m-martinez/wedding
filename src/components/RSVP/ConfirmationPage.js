@@ -147,7 +147,7 @@ function ConfirmationPage({ setStep, guestRSVP }) {
         <div
           className="cards-container"
           style={{
-            maxWidth: 800,
+            // width: 800,
             marginTop: 10,
             display: "flex",
             flexWrap: "wrap",

@@ -431,6 +431,7 @@ input[type="checkbox"]:hover {
   transition: background-color 0.3s ease, color 0.3s ease,
     border-color 0.3s ease;
   font-weight: 600;
+  justify-self: center;
 }
 
 .email-button:hover {
@@ -712,9 +713,13 @@ input[type="checkbox"]:hover {
   }
 
   .buttonsContainer {
-    width: 100%;
-    padding: 0px 66px;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    padding: 0px 0px;
+  }
+
+  .cards-container {
+    width: 350px;
+    /* padding: 0px 0px; */
   }
 }
 

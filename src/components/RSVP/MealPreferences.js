@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useScrollToHeader } from "./rsvp-utils";
 
@@ -7,149 +7,153 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
 
   useScrollToHeader(60);
 
-  // Get all guests from guestRSVP
-  const getAllGuests = () => {
+  const getAllGuests = useCallback(() => {
     const guests = [];
-
-    // Iterate through all guest parties in guestRSVP
-    Object.keys(guestRSVP).forEach((partyName) => {
+    // CRITICAL FIX: Ensure guestRSVP is an object before calling Object.keys
+    Object.keys(guestRSVP || {}).forEach((partyName) => {
+      // <-- Changed here
       const party = guestRSVP[partyName];
       if (party.guests) {
         Object.values(party.guests).forEach((guest) => {
-          guests.push(guest);
+          guests.push({ ...guest, partyName: partyName });
         });
       }
     });
-
     return guests;
-  };
+  }, [guestRSVP]);
 
-  const allGuests = getAllGuests();
+  const allGuests = useMemo(() => getAllGuests(), [getAllGuests]);
 
-  // Filter guests who said yes to at least one event
-  const attendingGuests = allGuests.filter((guest) => {
-    return guest.welcomeParty === true || guest.weddingDay === true;
-  });
+  const attendingGuests = useMemo(() => {
+    return allGuests.filter((guest) => {
+      return guest.welcomeParty === true || guest.weddingDay === true;
+    });
+  }, [allGuests]);
 
-  const entreeOptions = [
-    {
-      name: "Grilled Hanger Steak",
-      description: "GF, dairy",
-    },
-    {
-      name: "Roasted Chicken Breast",
-      description: "GF, dairy",
-    },
-  ];
+  const entreeOptions = useMemo(
+    () => [
+      { name: "Grilled Hanger Steak", description: "GF, dairy" },
+      { name: "Roasted Chicken Breast", description: "GF, dairy" },
+    ],
+    []
+  );
 
-  const cakeOptions = [
-    {
-      name: "Lemon Blueberry",
-      description: "Gluten, dairy",
-    },
-    {
-      name: "Strawberry Shortcake",
-      description: "Gluten, dairy",
-    },
-    {
-      name: "Bananas Foster",
-      description: "Gluten, dairy",
-    },
-    {
-      name: "Olive Oil Pistachio & Fig",
-      description: "Gluten, dairy, nuts",
-    },
-    {
-      name: "Vanilla & Raspberry Jam",
-      description: "GF, vegan",
-    },
-  ];
+  const cakeOptions = useMemo(
+    () => [
+      { name: "Lemon Blueberry", description: "Gluten, dairy" },
+      { name: "Strawberry Shortcake", description: "Gluten, dairy" },
+      { name: "Bananas Foster", description: "Gluten, dairy" },
+      { name: "Olive Oil Pistachio & Fig", description: "Gluten, dairy, nuts" },
+      { name: "Vanilla & Raspberry Jam", description: "GF, vegan" },
+    ],
+    []
+  );
 
-  const handleMealSelection = (guestName, mealType, selection) => {
-    setMealSelections((prev) => ({
-      ...prev,
-      [guestName]: {
-        ...prev[guestName],
-        [mealType]: selection,
-      },
-    }));
-  };
-
-  const handleDietaryInput = (guestName, fieldType, value) => {
-    setMealSelections((prev) => ({
-      ...prev,
-      [guestName]: {
-        ...prev[guestName],
-        [fieldType]: value,
-      },
-    }));
-  };
-
-  // Check if all attending guests have made their meal selections and all guests have completed dietary fields
-  const allRequiredFieldsCompleted = attendingGuests.every((guest) => {
-    const selections = mealSelections[guest.name];
-    const dietaryRestrictions = selections?.dietaryRestrictions || "";
-    const allergies = selections?.allergies || "";
-
-    // For wedding day guests, they need meal selections too
-    if (guest.weddingDay === true) {
-      return (
-        selections &&
-        selections.entree &&
-        selections.cake &&
-        dietaryRestrictions !== undefined &&
-        allergies !== undefined
+  const getGuestUniqueId = useCallback((guest) => {
+    if (!guest.partyName) {
+      console.error(
+        "Guest object missing partyName for unique ID generation:",
+        guest
       );
+      return `noPartyName-${guest.name}`;
     }
+    return `${guest.partyName}-${guest.name}`;
+  }, []);
 
-    // For non-wedding day guests, just need dietary fields
-    return dietaryRestrictions !== undefined && allergies !== undefined;
-  });
+  const handleMealSelection = useCallback(
+    (guest, mealType, selection) => {
+      const guestId = getGuestUniqueId(guest);
+      setMealSelections((prev) => ({
+        ...prev,
+        [guestId]: {
+          ...prev[guestId],
+          [mealType]: selection,
+        },
+      }));
+    },
+    [getGuestUniqueId]
+  );
 
-  const handleNext = () => {
-    // Update guestRSVP with meal preferences
+  const handleDietaryInput = useCallback(
+    (guest, fieldType, value) => {
+      const guestId = getGuestUniqueId(guest);
+      setMealSelections((prev) => ({
+        ...prev,
+        [guestId]: {
+          ...prev[guestId], // Keep existing dietary info
+          [fieldType]: value, // Set the specific field
+        },
+      }));
+    },
+    [getGuestUniqueId]
+  );
+
+  const allRequiredFieldsCompleted = useMemo(() => {
+    // console.log("--- Checking allRequiredFieldsCompleted ---");
+    const isComplete = attendingGuests.every((guest) => {
+      const guestId = getGuestUniqueId(guest);
+      const selections = mealSelections[guestId];
+
+      // console.log(`Guest: ${guest.name}, ID: ${guestId}`);
+      // console.log("Current Selections for this guest:", selections);
+
+      let guestComplete = true; // Assume complete by default
+
+      // Only check for entree and cake if the guest is attending the wedding day
+      if (guest.weddingDay === true) {
+        guestComplete = !!selections?.entree && !!selections?.cake;
+        // console.log(`  ${guest.name} (Wedding Day): Entree: ${!!selections?.entree}, Cake: ${!!selections?.cake} => ${guestComplete}`);
+      } else {
+        // console.log(`  ${guest.name} (Welcome Party Only): No required fields, assuming true.`);
+      }
+
+      return guestComplete;
+    });
+
+    // console.log("Overall completion status:", isComplete);
+    return isComplete;
+  }, [attendingGuests, mealSelections, getGuestUniqueId]);
+
+  const handleNext = useCallback(() => {
     setGuestRSVP((prev) => {
       const updated = { ...prev };
 
-      // Add meal preferences for each guest party
       Object.keys(updated).forEach((partyName) => {
         const party = updated[partyName];
         if (party.guests) {
-          // Initialize mealPreferences if it doesn't exist
           if (!updated[partyName].mealPreferences) {
             updated[partyName].mealPreferences = {};
           }
 
-          // Add meal preferences and dietary info for all guests
           Object.values(party.guests).forEach((guest) => {
-            if (mealSelections[guest.name]) {
-              const guestSelections = mealSelections[guest.name];
-              updated[partyName].mealPreferences[guest.name] = {
-                dietaryRestrictions: guestSelections.dietaryRestrictions || "",
-                allergies: guestSelections.allergies || "",
-              };
+            const guestInPrevState = { ...guest, partyName };
+            const guestId = getGuestUniqueId(guestInPrevState);
 
-              // Only add meal selections for wedding day attendees
-              if (guest.weddingDay === true) {
-                updated[partyName].mealPreferences[guest.name].entree =
-                  guestSelections.entree;
-                updated[partyName].mealPreferences[guest.name].cake =
-                  guestSelections.cake;
-              }
+            const guestSelections = mealSelections[guestId] || {};
+
+            updated[partyName].mealPreferences[guest.name] = {
+              dietaryRestrictions: guestSelections.dietaryRestrictions || "",
+              allergies: guestSelections.allergies || "",
+            };
+
+            if (guest.weddingDay === true) {
+              updated[partyName].mealPreferences[guest.name].entree =
+                guestSelections.entree || null;
+              updated[partyName].mealPreferences[guest.name].cake =
+                guestSelections.cake || null;
             }
           });
         }
       });
-
       return updated;
     });
 
     setStep("Confirmation page");
-  };
+  }, [setGuestRSVP, setStep, getGuestUniqueId, mealSelections]);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setStep("Guests attending");
-  };
+  }, [setStep]);
 
   return (
     <motion.div
@@ -178,226 +182,216 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
               attendingGuests.length === 1 ? "single-guest" : ""
             }`}
           >
-            {attendingGuests.map((guest, index) => (
-              <div
-                key={`${guest.name}-${index}`}
-                className="guestCard mealPreferences"
-              >
-                <h5 style={{ marginBottom: 0, fontWeight: 700 }}>
-                  {guest.name}
-                </h5>
-                <p style={{ marginBottom: 15 }}>
-                  <i>
-                    Attending:{" "}
-                    {[
-                      guest.weddingDay && "Wedding Day",
-                      guest.welcomeParty && "Welcome Drinks",
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
-                  </i>
-                </p>
+            {attendingGuests.map((guest) => {
+              const guestId = getGuestUniqueId(guest);
+              return (
+                <div key={guestId} className="guestCard mealPreferences">
+                  <h5 style={{ marginBottom: 0, fontWeight: 700 }}>
+                    {guest.name}
+                  </h5>
+                  <p style={{ marginBottom: 15 }}>
+                    <i>
+                      Attending:{" "}
+                      {[
+                        guest.weddingDay && "Wedding Day",
+                        guest.welcomeParty && "Welcome Drinks",
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </i>
+                  </p>
 
-                {/* Only show meal selections for wedding day attendees */}
-                {guest.weddingDay === true && (
-                  <>
-                    <h6
-                      style={{
-                        marginBottom: 15,
-                        marginTop: 20,
-                        fontWeight: 600,
-                        fontSize: 16,
-                        color: "#555",
-                      }}
-                    >
-                      Wedding Day Selections
-                    </h6>
-                    {/* Entree Selection */}
-                    <div style={{ marginBottom: 15 }}>
-                      <p
+                  {guest.weddingDay === true && (
+                    <>
+                      <h6
                         style={{
-                          marginBottom: 5,
-                          fontSize: 18,
-                          fontWeight: 500,
+                          marginBottom: 15,
+                          marginTop: 20,
+                          fontWeight: 600,
+                          fontSize: 16,
+                          color: "#555",
                         }}
                       >
-                        Entree Selection
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 8,
-                        }}
-                      >
-                        {entreeOptions.map((entree) => (
-                          <label
-                            key={entree.name}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 8,
-                              cursor: "pointer",
-                              userSelect: "none",
-                            }}
-                          >
-                            <input
-                              type="radio"
+                        Wedding Day Selections
+                      </h6>
+                      <div style={{ marginBottom: 15 }}>
+                        <p
+                          style={{
+                            marginBottom: 5,
+                            fontSize: 18,
+                            fontWeight: 500,
+                          }}
+                        >
+                          Entree Selection
+                        </p>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 8,
+                          }}
+                        >
+                          {entreeOptions.map((entree) => (
+                            <label
+                              key={entree.name}
                               style={{
-                                accentColor: "#ffdee8",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                                cursor: "pointer",
+                                userSelect: "none",
                               }}
-                              name={`${guest.name}-entree`}
-                              checked={
-                                mealSelections[guest.name]?.entree ===
-                                entree.name
-                              }
-                              onChange={() =>
-                                handleMealSelection(
-                                  guest.name,
-                                  "entree",
+                            >
+                              <input
+                                type="radio"
+                                style={{
+                                  accentColor: "#ffdee8",
+                                }}
+                                name={`${guestId}-entree`}
+                                checked={
+                                  mealSelections[guestId]?.entree ===
                                   entree.name
-                                )
-                              }
-                            />
-                            <span>
-                              {entree.name}{" "}
-                              <span
-                                style={{
-                                  fontSize: 14,
-                                  color: "#666",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                {entree.description}
+                                }
+                                onChange={() =>
+                                  handleMealSelection(
+                                    guest,
+                                    "entree",
+                                    entree.name
+                                  )
+                                }
+                              />
+                              <span>
+                                {entree.name}{" "}
+                                <span
+                                  style={{
+                                    fontSize: 14,
+                                    color: "#666",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  {entree.description}
+                                </span>
                               </span>
-                            </span>
-                          </label>
-                        ))}
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Cake Selection */}
-                    <div style={{ marginBottom: 15 }}>
-                      <p
-                        style={{
-                          marginBottom: 5,
-                          fontSize: 18,
-                          fontWeight: 500,
-                        }}
-                      >
-                        Cake Selection
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 8,
-                        }}
-                      >
-                        {cakeOptions.map((cake) => (
-                          <label
-                            key={cake.name}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 8,
-                              cursor: "pointer",
-                              userSelect: "none",
-                            }}
-                          >
-                            <input
-                              type="radio"
-                              style={{ accentColor: "#ffdee8" }}
-                              name={`${guest.name}-cake`}
-                              checked={
-                                mealSelections[guest.name]?.cake === cake.name
-                              }
-                              onChange={() =>
-                                handleMealSelection(
-                                  guest.name,
-                                  "cake",
-                                  cake.name
-                                )
-                              }
-                            />
-                            <span>
-                              {cake.name}
-                              &nbsp;
-                              <span
-                                style={{
-                                  fontSize: 14,
-                                  color: "#666",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                {cake.description}
+                      <div style={{ marginBottom: 15 }}>
+                        <p
+                          style={{
+                            marginBottom: 5,
+                            fontSize: 18,
+                            fontWeight: 500,
+                          }}
+                        >
+                          Cake Selection
+                        </p>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 8,
+                          }}
+                        >
+                          {cakeOptions.map((cake) => (
+                            <label
+                              key={cake.name}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                                cursor: "pointer",
+                                userSelect: "none",
+                              }}
+                            >
+                              <input
+                                type="radio"
+                                style={{ accentColor: "#ffdee8" }}
+                                name={`${guestId}-cake`}
+                                checked={
+                                  mealSelections[guestId]?.cake === cake.name
+                                }
+                                onChange={() =>
+                                  handleMealSelection(guest, "cake", cake.name)
+                                }
+                              />
+                              <span>
+                                {cake.name}
+                                &nbsp;
+                                <span
+                                  style={{
+                                    fontSize: 14,
+                                    color: "#666",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  {cake.description}
+                                </span>
                               </span>
-                            </span>
-                          </label>
-                        ))}
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
 
-                {/* Dietary Information - shown for all attending guests */}
-                <div style={{ marginBottom: 10 }}>
-                  <p style={{ marginBottom: 5, fontSize: 18, fontWeight: 500 }}>
-                    Dietary Restrictions
-                  </p>
-                  <textarea
-                    value={
-                      mealSelections[guest.name]?.dietaryRestrictions || ""
-                    }
-                    onChange={(e) =>
-                      handleDietaryInput(
-                        guest.name,
-                        "dietaryRestrictions",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Please list any dietary restrictions..."
-                    style={{
-                      width: "100%",
-                      height: 44,
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 4,
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                      color: "#5f5f5f",
-                    }}
-                  />
-                </div>
+                  <div style={{ marginBottom: 10 }}>
+                    <p
+                      style={{ marginBottom: 5, fontSize: 18, fontWeight: 500 }}
+                    >
+                      Dietary Restrictions
+                    </p>
+                    <textarea
+                      value={mealSelections[guestId]?.dietaryRestrictions || ""}
+                      onChange={(e) =>
+                        handleDietaryInput(
+                          guest,
+                          "dietaryRestrictions",
+                          e.target.value
+                        )
+                      }
+                      placeholder="Please list any dietary restrictions..."
+                      style={{
+                        width: "100%",
+                        height: 44,
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 4,
+                        resize: "vertical",
+                        fontFamily: "inherit",
+                        color: "#5f5f5f",
+                      }}
+                    />
+                  </div>
 
-                <div>
-                  <p style={{ marginBottom: 5, fontSize: 18, fontWeight: 500 }}>
-                    Allergies
-                  </p>
-                  <textarea
-                    value={mealSelections[guest.name]?.allergies || ""}
-                    onChange={(e) =>
-                      handleDietaryInput(
-                        guest.name,
-                        "allergies",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Please list any food allergies..."
-                    style={{
-                      width: "100%",
-                      height: 44,
-                      padding: 8,
-                      border: "1px solid #ccc",
-                      borderRadius: 4,
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                      color: "#5f5f5f",
-                    }}
-                  />
+                  <div>
+                    <p
+                      style={{ marginBottom: 5, fontSize: 18, fontWeight: 500 }}
+                    >
+                      Allergies
+                    </p>
+                    <textarea
+                      value={mealSelections[guestId]?.allergies || ""}
+                      onChange={(e) =>
+                        handleDietaryInput(guest, "allergies", e.target.value)
+                      }
+                      placeholder="Please list any food allergies..."
+                      style={{
+                        width: "100%",
+                        height: 44,
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 4,
+                        resize: "vertical",
+                        fontFamily: "inherit",
+                        color: "#5f5f5f",
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div

@@ -45,6 +45,8 @@ function ConfirmationPage({ setStep, guestRSVP }) {
 
   const allGuests = getAllGuests();
 
+  // In ConfirmationPage.js (your frontend component)
+
   const prepareRSVPData = () => {
     const rsvpData = {
       timestamp: new Date().toISOString(),
@@ -72,11 +74,6 @@ function ConfirmationPage({ setStep, guestRSVP }) {
           });
         });
       }
-
-      partyData.guests = partyData.guests.filter(
-        (guest) => guest.welcomeParty || guest.weddingDay
-      );
-
       if (partyData.guests.length > 0) {
         rsvpData.parties.push(partyData);
       }
@@ -147,12 +144,14 @@ function ConfirmationPage({ setStep, guestRSVP }) {
         <div
           className="cards-container"
           style={{
-            // width: 800,
+            // width: 800, // This was commented out, but we need to control width
             marginTop: 10,
             display: "flex",
             flexWrap: "wrap",
             justifyContent: "center",
             gap: 20,
+            maxWidth: 740, // Max width for two 350px cards + 20px gap
+            margin: "10px auto", // Center the container horizontally
           }}
         >
           {allGuests.map((guest, index) => {
@@ -278,7 +277,15 @@ function ConfirmationPage({ setStep, guestRSVP }) {
           })}
 
           {/* Buttons container */}
-          <div className="buttonsContainer">
+          <div
+            className="buttonsContainer"
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 20,
+            }}
+          >
             <button
               onClick={handleBack}
               className="backButton"
@@ -296,7 +303,6 @@ function ConfirmationPage({ setStep, guestRSVP }) {
               disabled={isSubmitting}
               className="completeRSVPButton"
               style={{
-                // padding: "10px 20px",
                 borderRadius: 6,
                 cursor: isSubmitting ? "not-allowed" : "pointer",
                 width: "auto",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useScrollToHeader } from "./rsvp-utils";
 
@@ -10,6 +10,7 @@ function GuestsAttending({
   setGuestRSVP,
 }) {
   const [nextStep, setNextStep] = useState(null);
+  // Change individualResponses to use a truly unique ID as the key
   const [individualResponses, setIndividualResponses] = useState({});
 
   useScrollToHeader(60);
@@ -34,92 +35,135 @@ function GuestsAttending({
 
   const guestCount = guestEntry?.guest_count;
 
-  const guestParties = {
-    "Salvador Martinez": [
-      "Michelle Martinez",
-      "Ana De Los Santos",
-      "Mama",
-      "Papa",
-      "Lindo Martinez",
-      "Elijah Martinez",
-      "Princess",
-    ],
-    "Juliana Martinez": ["Julian Martinez", "Josh Martinez"],
-    "Lina Martinez": ["Valentina Suarez"],
-    "Isabella Martinez": ["Hieu Tran"],
-    "Stephanie Gensheimer": [
-      "Steve Gensheimer",
-      "Claire Gensheimer",
-      "Jack Gensheimer",
-    ],
-  };
+  const guestParties = useMemo(
+    () => ({
+      "Salvador Martinez": [
+        "Michelle Martinez",
+        "Ana De Los Santos",
+        "Mama",
+        "Papa",
+        "Lindo Martinez",
+        "Elijah Martinez",
+        "Princess",
+      ],
+      "Juliana Martinez": ["Julian Martinez", "Josh Martinez"],
+      "Lina Martinez": ["Valentina Suarez"],
+      "Isabella Martinez": ["Hieu Tran"],
+      "Stephanie Gensheimer": [
+        "Steve Gensheimer",
+        "Claire Gensheimer",
+        "Jack Gensheimer",
+      ],
+    }),
+    []
+  );
 
-  const createGuestList = () => {
+  // Helper to create a unique ID for each guest
+  const getUniqueGuestId = useCallback(
+    (name) => `${normalizedGuestSelected}-${name}`,
+    [normalizedGuestSelected]
+  );
+
+  const createGuestList = useCallback(() => {
     const rawNames = normalizedGuestSelected
       .split(" & ")
       .map((name) => name.trim());
 
     const guests = [];
+    const addedNames = new Set(); // Keep track of names already added
 
+    // Add main guests from normalizedGuestSelected
     if (
       rawNames.length === 2 &&
       !rawNames[0].includes(" ") &&
       rawNames[1].includes(" ")
     ) {
       const lastName = rawNames[1].split(" ").pop();
-      guests.push({
-        id: 1,
-        name: `${rawNames[0]} ${lastName}`,
-        isMainGuest: true,
-      });
-      guests.push({ id: 2, name: rawNames[1], isMainGuest: false });
-    } else {
-      rawNames.forEach((name, index) => {
+      const guest1Name = `${rawNames[0]} ${lastName}`;
+      if (!addedNames.has(guest1Name)) {
         guests.push({
-          id: index + 1,
-          name,
-          isMainGuest: index === 0,
+          uniqueId: getUniqueGuestId(guest1Name), // Use uniqueId here
+          name: guest1Name,
+          isMainGuest: true,
         });
+        addedNames.add(guest1Name);
+      }
+      if (!addedNames.has(rawNames[1])) {
+        guests.push({
+          uniqueId: getUniqueGuestId(rawNames[1]), // Use uniqueId here
+          name: rawNames[1],
+          isMainGuest: false,
+        });
+        addedNames.add(rawNames[1]);
+      }
+    } else {
+      rawNames.forEach((name) => {
+        if (!addedNames.has(name)) {
+          guests.push({
+            uniqueId: getUniqueGuestId(name), // Use uniqueId here
+            name,
+            isMainGuest: guests.length === 0, // First added guest is main
+          });
+          addedNames.add(name);
+        }
       });
+
+      // console.log(addedNames);
     }
 
-    const remainingGuests = Math.max(0, (guestCount || 0) - guests.length);
-    const mainGuestName = guests[0]?.name || "";
-    const specificGuests = guestParties[mainGuestName] || [];
+    // Add specific guests from guestParties, avoiding duplicates and respecting guestCount
+    const mainGuestNameForParty = guests[0]?.name || "";
+    const specificGuestsFromParty = guestParties[mainGuestNameForParty] || [];
 
-    for (let i = 0; i < remainingGuests; i++) {
-      guests.push({
-        id: guests.length + 1,
-        name: specificGuests[i] || `Guest ${guests.length + 1}`,
-        isMainGuest: false,
-      });
+    for (const name of specificGuestsFromParty) {
+      if (guests.length >= (guestCount || Infinity)) break; // Stop if guestCount is reached
+      if (!addedNames.has(name)) {
+        guests.push({
+          uniqueId: getUniqueGuestId(name), // Use uniqueId here
+          name,
+          isMainGuest: false, // These are never main guests
+        });
+        addedNames.add(name);
+      }
     }
 
-    return guests.slice(0, guestCount || guests.length);
-  };
+    // If guestCount is larger than initially identified guests, add generic "Guest X"
+    while (guests.length < (guestCount || 0)) {
+      const newGuestName = `Guest ${guests.length + 1}`;
+      // Ensure generic guest names are also unique if needed, though less likely to clash
+      const uniqueNewGuestName = newGuestName; // You could add a timestamp or random string if highly concerned about clash
+      if (!addedNames.has(uniqueNewGuestName)) {
+        guests.push({
+          uniqueId: getUniqueGuestId(uniqueNewGuestName),
+          name: uniqueNewGuestName,
+          isMainGuest: false,
+        });
+        addedNames.add(uniqueNewGuestName);
+      }
+    }
 
-  const guests = useMemo(createGuestList, [
-    normalizedGuestSelected,
-    guestCount,
-  ]);
+    return guests.slice(0, guestCount || guests.length); // Ensure we don't exceed guestCount
+  }, [normalizedGuestSelected, guestCount, guestParties, getUniqueGuestId]);
 
-  const handleAttendanceChange = (guest, event, isAttending) => {
+  const guests = useMemo(createGuestList, [createGuestList]); // Depend on createGuestList itself, which has useCallback
+
+  const handleAttendanceChange = useCallback((guest, event, isAttending) => {
     setIndividualResponses((prev) => ({
       ...prev,
-      [guest.id]: {
-        ...prev[guest.id],
+      [guest.uniqueId]: {
+        ...prev[guest.uniqueId],
         [event]: isAttending,
         allEvents: false,
         noEvents: false,
       },
     }));
-  };
+  }, []);
 
-  const handleBulkAttendanceChange = (guest, type, checked) => {
+  const handleBulkAttendanceChange = useCallback((guest, type, checked) => {
     setIndividualResponses((prev) => ({
       ...prev,
-      [guest.id]: {
-        ...prev[guest.id],
+      [guest.uniqueId]: {
+        ...prev[guest.uniqueId],
         [type]: checked,
         [type === "allEvents" ? "noEvents" : "allEvents"]: false,
         welcomeParty:
@@ -127,31 +171,33 @@ function GuestsAttending({
             ? checked
             : type === "noEvents"
             ? false
-            : prev[guest.id]?.welcomeParty,
+            : prev[guest.uniqueId]?.welcomeParty, // Use uniqueId here
         weddingDay:
           type === "allEvents"
             ? checked
             : type === "noEvents"
             ? false
-            : prev[guest.id]?.weddingDay,
+            : prev[guest.uniqueId]?.weddingDay, // Use uniqueId here
       },
     }));
-  };
+  }, []);
 
-  // Fixed sync effect - now stores complete guest data, not just counts
+  // Sync effect - now stores complete guest data, not just counts
   useEffect(() => {
+    // Correctly calculate counts based on uniqueId in individualResponses
     const welcomePartyCount = guests.filter(
-      (g) => individualResponses[g.id]?.welcomeParty === true
+      (g) => individualResponses[g.uniqueId]?.welcomeParty === true
     ).length;
     const weddingDayCount = guests.filter(
-      (g) => individualResponses[g.id]?.weddingDay === true
+      (g) => individualResponses[g.uniqueId]?.weddingDay === true
     ).length;
 
     if (normalizedGuestSelected && guestCount > 0) {
-      // Create guest details with responses
+      // Create guest details with responses using uniqueId
       const guestDetails = guests.reduce((acc, guest) => {
-        const response = individualResponses[guest.id];
-        acc[guest.id] = {
+        const response = individualResponses[guest.uniqueId]; // Use uniqueId here
+        acc[guest.name] = {
+          // Still store by guest.name in guestRSVP for consistency
           name: guest.name,
           welcomeParty: response?.welcomeParty || false,
           weddingDay: response?.weddingDay || false,
@@ -181,17 +227,22 @@ function GuestsAttending({
     setGuestRSVP,
   ]);
 
-  const allResponded = guests.every((guest) => {
-    const r = individualResponses[guest.id];
-    return (
-      typeof r?.welcomeParty === "boolean" && typeof r?.weddingDay === "boolean"
-    );
-  });
+  const allResponded = useMemo(() => {
+    return guests.every((guest) => {
+      const r = individualResponses[guest.uniqueId]; // Use uniqueId here
+      return (
+        typeof r?.welcomeParty === "boolean" &&
+        typeof r?.weddingDay === "boolean"
+      );
+    });
+  }, [guests, individualResponses]);
 
-  const anyAttending = guests.some((guest) => {
-    const r = individualResponses[guest.id];
-    return r?.welcomeParty === true || r?.weddingDay === true;
-  });
+  const anyAttending = useMemo(() => {
+    return guests.some((guest) => {
+      const r = individualResponses[guest.uniqueId]; // Use uniqueId here
+      return r?.welcomeParty === true || r?.weddingDay === true;
+    });
+  }, [guests, individualResponses]);
 
   useEffect(() => {
     if (allResponded) {
@@ -241,9 +292,9 @@ function GuestsAttending({
             }`}
           >
             {guests.map((guest) => {
-              const response = individualResponses[guest.id] || {};
+              const response = individualResponses[guest.uniqueId] || {}; // Use uniqueId here
               return (
-                <div key={guest.id} className="guestCard">
+                <div key={guest.uniqueId} className="guestCard">
                   <h5 style={{ marginBottom: 9, fontWeight: 700 }}>
                     {guest.name}
                   </h5>

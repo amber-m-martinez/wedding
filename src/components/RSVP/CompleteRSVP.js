@@ -87,9 +87,15 @@ function CompleteRSVP({ guestRSVP }) {
           (guest) => guest.welcomeParty
         ).length;
 
+        // Filter out guests who are not attending any event for meal preferences
+        const guestsAttending = partyGuests.filter(
+          (guest) => guest.welcomeParty || guest.weddingDay
+        );
+
         summary.parties.push({
           name: partyName,
-          guests: partyGuests,
+          guests: partyGuests, // Keep all guests for attendance summary
+          guestsAttending: guestsAttending, // New array for meal preferences
           weddingDayCount,
           welcomePartyCount,
           mealPreferences: party.mealPreferences || {},
@@ -104,6 +110,45 @@ function CompleteRSVP({ guestRSVP }) {
   };
 
   const rsvpSummary = formatRSVPForDisplay();
+
+  // New function to prepare all RSVP data for the Google Sheet, including "No" RSVPs
+  const prepareRSVPDataForSheet = () => {
+    const rsvpData = {
+      timestamp: new Date().toISOString(),
+      parties: [],
+    };
+
+    Object.keys(guestRSVP).forEach((partyName) => {
+      const party = guestRSVP[partyName];
+      const partyData = {
+        partyName: partyName,
+        guests: [],
+      };
+
+      if (party.guests) {
+        Object.values(party.guests).forEach((guest) => {
+          const mealPrefs = party.mealPreferences?.[guest.name] || {};
+          partyData.guests.push({
+            name: guest.name,
+            welcomeParty: guest.welcomeParty || false,
+            weddingDay: guest.weddingDay || false,
+            // Include meal preferences even if not attending, they'll just be empty
+            entree: mealPrefs.entree || "",
+            cake: mealPrefs.cake || "",
+            dietaryRestrictions: mealPrefs.dietaryRestrictions || "",
+            allergies: mealPrefs.allergies || "",
+          });
+        });
+      }
+      // Crucially, we no longer filter `partyData.guests` here.
+      // All guests will be included in `partyData.guests`,
+      // even if both welcomeParty and weddingDay are false.
+
+      rsvpData.parties.push(partyData); // Always push the party data
+    });
+
+    return rsvpData;
+  };
 
   const handleEmailButtonClick = () => {
     setShowEmailInput(true);
@@ -409,100 +454,100 @@ function CompleteRSVP({ guestRSVP }) {
                   ))}
                 </div>
 
-                {party.mealPreferences &&
-                  Object.keys(party.mealPreferences).length > 0 && (
-                    <div style={{ marginLeft: 6 }}>
-                      <p
-                        style={{
-                          fontWeight: 650,
-                          marginBottom: 10,
-                          fontSize: 16,
-                        }}
-                      >
-                        Meal Preferences:
-                      </p>
-                      {Object.entries(party.mealPreferences).map(
-                        ([guestName, prefs]) => (
-                          <div
-                            key={guestName}
+                {/* Only show Meal Preferences if there are guests attending */}
+                {party.guestsAttending.length > 0 && (
+                  <div style={{ marginLeft: 6 }}>
+                    <p
+                      style={{
+                        fontWeight: 650,
+                        marginBottom: 10,
+                        fontSize: 16,
+                      }}
+                    >
+                      Meal Preferences:
+                    </p>
+                    {party.guestsAttending.map((guest) => {
+                      const prefs = party.mealPreferences[guest.name] || {};
+                      return (
+                        <div
+                          key={guest.name} // Use guest.name as key here since it's unique within attending guests
+                          style={{
+                            marginLeft: 7,
+                            marginBottom: 8,
+                          }}
+                        >
+                          <p
                             style={{
-                              marginLeft: 7,
-                              marginBottom: 8,
+                              margin: "2px 0",
+                              fontSize: 16,
+                              fontWeight: 550,
                             }}
                           >
-                            <p
-                              style={{
-                                margin: "2px 0",
-                                fontSize: 16,
-                                fontWeight: 550,
-                              }}
-                            >
-                              {guestName}
-                            </p>
-                            <p
-                              style={{
-                                margin: "2px 0",
-                                fontSize: 16,
-                              }}
-                            >
-                              Entree: {prefs.entree || "Not specified"}
-                              {getDescription(entreeOptions, prefs.entree) && (
-                                <span
-                                  style={{
-                                    fontStyle: "italic",
-                                    fontSize: 14,
-                                    marginLeft: 6,
-                                  }}
-                                >
-                                  {getDescription(entreeOptions, prefs.entree)}
-                                </span>
-                              )}
-                            </p>
-                            <p
-                              style={{
-                                margin: "2px 0",
-                                fontSize: 16,
-                              }}
-                            >
-                              Cake: {prefs.cake || "Not specified"}
-                              {getDescription(cakeOptions, prefs.cake) && (
-                                <span
-                                  style={{
-                                    fontStyle: "italic",
-                                    fontSize: 14,
-                                    marginLeft: 6,
-                                  }}
-                                >
-                                  {getDescription(cakeOptions, prefs.cake)}
-                                </span>
-                              )}
-                            </p>
-                            {prefs.dietaryRestrictions && (
-                              <p
+                            {guest.name}
+                          </p>
+                          <p
+                            style={{
+                              margin: "2px 0",
+                              fontSize: 16,
+                            }}
+                          >
+                            Entree: {prefs.entree || "Not specified"}
+                            {getDescription(entreeOptions, prefs.entree) && (
+                              <span
                                 style={{
-                                  margin: "2px 0",
-                                  fontSize: 16,
+                                  fontStyle: "italic",
+                                  fontSize: 14,
+                                  marginLeft: 6,
                                 }}
                               >
-                                Dietary Restrictions:{" "}
-                                {prefs.dietaryRestrictions}
-                              </p>
+                                {getDescription(entreeOptions, prefs.entree)}
+                              </span>
                             )}
-                            {prefs.allergies && (
-                              <p
+                          </p>
+                          <p
+                            style={{
+                              margin: "2px 0",
+                              fontSize: 16,
+                            }}
+                          >
+                            Cake: {prefs.cake || "Not specified"}
+                            {getDescription(cakeOptions, prefs.cake) && (
+                              <span
                                 style={{
-                                  margin: "2px 0",
-                                  fontSize: 16,
+                                  fontStyle: "italic",
+                                  fontSize: 14,
+                                  marginLeft: 6,
                                 }}
                               >
-                                Allergies: {prefs.allergies}
-                              </p>
+                                {getDescription(cakeOptions, prefs.cake)}
+                              </span>
                             )}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  )}
+                          </p>
+                          {prefs.dietaryRestrictions && (
+                            <p
+                              style={{
+                                margin: "2px 0",
+                                fontSize: 16,
+                              }}
+                            >
+                              Dietary Restrictions: {prefs.dietaryRestrictions}
+                            </p>
+                          )}
+                          {prefs.allergies && (
+                            <p
+                              style={{
+                                margin: "2px 0",
+                                fontSize: 16,
+                              }}
+                            >
+                              Allergies: {prefs.allergies}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ))}
           </motion.div>

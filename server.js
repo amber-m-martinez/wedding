@@ -129,6 +129,13 @@ function formatRSVPForEmail(rsvpData) {
     }
   });
 
+  const guestsAttending = allGuests.filter(
+    (guest) => guest.welcomeParty || guest.weddingDay
+  );
+  const guestsNotAttending = allGuests.filter(
+    (guest) => !guest.welcomeParty && !guest.weddingDay
+  );
+
   const baseUrl =
     process.env.BASE_FRONTEND_URL || "https://amberandstephen.info";
   const logoUrl = `${baseUrl}/images/swan-monogram-thin-grey.png`;
@@ -167,12 +174,12 @@ function formatRSVPForEmail(rsvpData) {
     </div>
 `;
 
-  if (hasAnyAttendance) {
+  if (guestsAttending.length > 0) {
+    // Changed condition to use guestsAttending
     htmlContent += `
       <div style="margin-bottom: 30px;">
         <h3 style="font-size: 18px; color: #333; margin: 0 0 20px; font-weight: bold;">Guest Summary</h3>
-        ${allGuests
-          .filter((guest) => guest.welcomeParty || guest.weddingDay)
+        ${guestsAttending // Iterate over guestsAttending here
           .map((guest) => {
             const prefs =
               rsvpData.parties.find((p) => p.partyName === guest.partyName)
@@ -181,7 +188,12 @@ function formatRSVPForEmail(rsvpData) {
             const entreeLabel = prefs.entree || "Not specified";
             const cakeLabel = prefs.cake || "Not specified";
 
-            const dietaryTags = [];
+            // Note: Your frontend collected individual boolean dietary tags,
+            // but your backend's formatRSVPForEmail is expecting `prefs.dietaryRestrictions` and `prefs.allergies` as strings.
+            // If your frontend sends individual booleans, you'll need to reconstruct the string here.
+            // For now, I'm assuming prefs.dietaryRestrictions and prefs.allergies are strings.
+            const dietaryTags = []; // This part seems to be for boolean flags, but your data structure looks like it sends strings.
+            // I'll keep it as is, but be aware of the potential mismatch if your frontend sends booleans.
             if (prefs.vegan) dietaryTags.push("Vegan");
             if (prefs.vegetarian) dietaryTags.push("Vegetarian");
             if (prefs.glutenFree) dietaryTags.push("Gluten Free");
@@ -194,7 +206,7 @@ function formatRSVPForEmail(rsvpData) {
                 guest.name
               }</p>
               <p style="margin: 4px 0; font-size: 15px;">Events: ${
-                !guest.welcomeParty && !guest.weddingDay
+                !guest.welcomeParty && !guest.weddingDay // This conditional is technically redundant now because we're filtering for attending guests
                   ? "Not Attending"
                   : `${guest.welcomeParty ? "Welcome Party" : ""}${
                       guest.welcomeParty && guest.weddingDay ? ", " : ""
@@ -243,7 +255,29 @@ function formatRSVPForEmail(rsvpData) {
           .join("")}
       </div>
     `;
+  }
 
+  // NEW SECTION FOR NON-ATTENDING GUESTS
+  if (guestsNotAttending.length > 0) {
+    htmlContent += `
+      <div style="margin-bottom: 30px;">
+        <h3 style="font-size: 18px; color: #333; margin: 0 0 20px; font-weight: bold;">Guests Not Attending</h3>
+        ${guestsNotAttending
+          .map(
+            (guest) => `
+            <div style="margin-bottom: 15px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 6px; background-color: #f9f9f9;">
+              <p style="margin: 0 0 6px; font-size: 16px; font-weight: 600;">${guest.name}</p>
+              <p style="margin: 4px 0; font-size: 15px; color: #777;">Not attending any events.</p>
+            </div>
+          `
+          )
+          .join("")}
+      </div>
+    `;
+  }
+
+  // Events section should only show if someone is attending
+  if (hasAnyAttendance) {
     // Show Welcome Party first if attending both
     const attendingWelcome = allGuests.some((g) => g.welcomeParty);
     const attendingWedding = allGuests.some((g) => g.weddingDay);

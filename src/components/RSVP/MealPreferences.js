@@ -36,7 +36,7 @@ function MealPreferences({ setGuestRSVP, setStep, guestRSVP }) {
         "Claire Gensheimer",
         "Jack Gensheimer",
         "Mia Lecaplain Cáceres",
-        "Amadi Martinez",
+        "Amadi Vasquez",
       ]),
     []
   );

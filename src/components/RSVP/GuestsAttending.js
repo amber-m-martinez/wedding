@@ -258,9 +258,9 @@ function GuestsAttending({
 
   const buttonText = allResponded
     ? anyAttending
-      ? "Next: Select meal preferences \u00A0⇨"
-      : "Confirm RSVP \u00A0⇨"
-    : "Next \u00A0⇨";
+      ? "Next: Select meal preferences \u00A0→"
+      : "Confirm RSVP \u00A0→"
+    : "Next \u00A0→";
 
   return (
     <motion.div

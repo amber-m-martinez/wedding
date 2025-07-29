@@ -29,10 +29,22 @@ function GuestLookup({ guestList, setStep, setGuestSelected }) {
     const queryTokens = normalizedQuery.split(/\s+/);
 
     const matches = guestList.filter((entry) => {
-      const individuals = entry.name.toLowerCase().split(/\s*(?:&|and|,)\s*/);
+      const fullName = entry.name.toLowerCase();
+      const individuals = fullName.split(/\s*(?:&|and|,)\s*/);
+
+      // Extract last name from the full entry (assuming it's the last word)
+      const lastNameMatch = fullName.match(/\b(\w+)\s*$/);
+      const lastName = lastNameMatch ? lastNameMatch[1] : "";
 
       return individuals.some((person) => {
-        const personTokens = person.split(/\s+/);
+        let searchName = person.trim();
+
+        // If this individual name doesn't contain the last name, append it
+        if (lastName && !searchName.includes(lastName)) {
+          searchName = searchName + " " + lastName;
+        }
+
+        const personTokens = searchName.split(/\s+/);
         for (
           let start = 0;
           start <= personTokens.length - queryTokens.length;
@@ -147,8 +159,8 @@ function GuestLookup({ guestList, setStep, setGuestSelected }) {
                   padding: "4px 8px",
                 }}
               >
-                No results. Please try again with your full name as indicated on
-                your invitation.
+                No matching or unique results. Please try again with your full
+                name.
               </motion.p>
             )}
 

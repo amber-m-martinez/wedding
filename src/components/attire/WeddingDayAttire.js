@@ -5,15 +5,14 @@ function WeddingDayAttire() {
   const womensAttire = [
     "/images/womens-attire/womens-attire-5.jpeg",
     "/images/womens-attire/womens-attire-13.jpeg",
-    "/images/womens-attire/womens-attire-4.jpeg",
     "/images/womens-attire/womens-attire-3.jpeg",
-
-    "/images/womens-attire/womens-attire-1.jpeg",
-    "/images/womens-attire/womens-attire-18.png",
-    "/images/womens-attire/womens-attire-15.png",
+    "/images/womens-attire/womens-attire-4.jpeg",
+    "/images/womens-attire/womens-attire-22.png",
+    "/images/womens-attire/womens-attire-10.jpeg",
+    "/images/womens-attire/womens-attire-21.png",
     "/images/womens-attire/womens-attire-17.jpeg",
     "/images/womens-attire/womens-attire-16.png",
-    "/images/womens-attire/womens-attire-10.jpeg",
+    "/images/womens-attire/womens-attire-18.png",
   ];
 
   const mensAttire = [

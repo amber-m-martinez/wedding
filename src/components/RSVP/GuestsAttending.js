@@ -41,6 +41,7 @@ function GuestsAttending({
         "Ana De Los Santos",
         "Mama",
         "Papa",
+        "Wendy Duverge",
         "Lindo Martinez",
         "Elijah Martinez",
         "Princess",

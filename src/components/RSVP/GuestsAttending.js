@@ -57,6 +57,7 @@ function GuestsAttending({
       "Laura Cáceres": ["Maxime Lecaplain", "Mia Lecaplain Cáceres"],
       "Ingrid Lapaix": ["Luis Baez", "Ana Elisa De Los Santos"],
       "Lizzie Pradel": ["Amadi Vasquez"],
+      "Salvi Martinez": ["Gretchen"],
     }),
     []
   );

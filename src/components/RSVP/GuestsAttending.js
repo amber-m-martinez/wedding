@@ -46,7 +46,7 @@ function GuestsAttending({
         "Elijah Martinez",
         "Princess",
       ],
-      "Juliana Martinez": ["Julian Martinez", "Josh Martinez"],
+      "Juliana Martinez": ["Julian Martinez", "Josh Martinez", "Chris Pino"],
       "Lina Martinez": ["Valentina Suarez"],
       "Isabella Martinez": ["Hieu Tran"],
       "Stephanie Gensheimer": [

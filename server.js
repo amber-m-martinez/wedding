@@ -29,8 +29,30 @@ app.use(express.json());
 const oauth2Client = new google.auth.OAuth2(
   process.env.GMAIL_CLIENT_ID,
   process.env.GMAIL_CLIENT_SECRET,
-  process.env.GMAIL_REDIRECT_URI
+  process.env.GMAIL_REDIRECT_URI ||
+    "https://developers.google.com/oauthplayground"
 );
+
+async function ensureValidGmailToken() {
+  try {
+    // Check if we have credentials
+    if (!oauth2Client.credentials || !oauth2Client.credentials.refresh_token) {
+      throw new Error(
+        "No refresh token available. Please re-authorize the app."
+      );
+    }
+
+    // Try to get a fresh access token using the refresh token
+    const { credentials } = await oauth2Client.refreshAccessToken();
+    oauth2Client.setCredentials(credentials);
+
+    console.log("✅ Gmail token refreshed successfully");
+    return true;
+  } catch (error) {
+    console.error("❌ Error refreshing Gmail token:", error.message);
+    throw error;
+  }
+}
 
 if (process.env.GMAIL_REFRESH_TOKEN) {
   oauth2Client.setCredentials({
@@ -52,7 +74,7 @@ const RANGE = "RSVPs!A:J";
 
 async function testGmailAuth() {
   try {
-    await oauth2Client.getAccessToken();
+    await ensureValidGmailToken();
     console.log("✅ Gmail OAuth2 Auth Succeeded");
   } catch (err) {
     console.error("❌ Gmail OAuth2 Auth Failed:", err.message);
@@ -421,11 +443,15 @@ app.post("/api/send-rsvp-email", async (req, res) => {
       });
     }
 
-    const credentials = oauth2Client.credentials;
-    if (!credentials || !credentials.access_token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Gmail authentication required." });
+    // Ensure we have a valid token before sending
+    try {
+      await ensureValidGmailToken();
+    } catch (tokenError) {
+      return res.status(401).json({
+        success: false,
+        message: "Gmail authentication failed. Please re-authorize the app.",
+        authUrl: `${req.protocol}://${req.get("host")}/auth/url`,
+      });
     }
 
     const htmlContent = formatRSVPForEmail(rsvpData);
@@ -447,6 +473,16 @@ app.post("/api/send-rsvp-email", async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error sending email:", error);
+
+    // Handle specific Gmail API errors
+    if (error.code === 401 || error.message.includes("invalid_grant")) {
+      return res.status(401).json({
+        success: false,
+        message: "Gmail authentication expired. Please re-authorize the app.",
+        authUrl: `${req.protocol}://${req.get("host")}/auth/url`,
+      });
+    }
+
     res.status(error.code || 500).json({
       success: false,
       message: error.message || "Email failed to send.",

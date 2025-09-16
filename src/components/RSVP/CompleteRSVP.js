@@ -264,7 +264,7 @@ function CompleteRSVP({ guestRSVP }) {
                     width: "100%",
                   }}
                 >
-                  <AnimatePresence mode="wait">
+                  {/* <AnimatePresence mode="wait">
                     {!showEmailInput ? (
                       <motion.button
                         key="email-button"
@@ -371,7 +371,7 @@ function CompleteRSVP({ guestRSVP }) {
                         </form>
                       </motion.div>
                     )}
-                  </AnimatePresence>
+                  </AnimatePresence> */}
                 </motion.div>
               ) : (
                 <motion.div

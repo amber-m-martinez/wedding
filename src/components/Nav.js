@@ -29,9 +29,6 @@ function Nav() {
         <a href="/gifts" className="navOptions">
           Registry
         </a>
-        {/* <a href="/rsvp" className="navOptions">
-          RSVP
-        </a> */}
         <div className="navBottomBorder"></div>
       </div>
     </div>

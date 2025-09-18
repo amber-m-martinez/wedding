@@ -6,7 +6,7 @@ import Events from "./components/Events";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HonoredGuests from "./components/honored-guests/HonoredGuests";
 import Gifts from "./components/Gifts";
-import RSVP from "./components/RSVP/RSVP";
+// import RSVP from "./components/RSVP/RSVP";
 import Attire from "./components/attire/Attire";
 import FAQs from "./components/FAQS/FAQs";
 import "./App.css";

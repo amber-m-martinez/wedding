@@ -29,9 +29,9 @@ function Nav() {
         <a href="/gifts" className="navOptions">
           Registry
         </a>
-        <a href="/rsvp" className="navOptions">
+        {/* <a href="/rsvp" className="navOptions">
           RSVP
-        </a>
+        </a> */}
         <div className="navBottomBorder"></div>
       </div>
     </div>

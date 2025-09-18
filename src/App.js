@@ -25,7 +25,7 @@ function App() {
         <Route exact path="/honored-guests" element={<HonoredGuests />}></Route>
         <Route exact path="/gifts" element={<Gifts />}></Route>
         <Route exact path="/FAQ" element={<FAQs />}></Route>
-        <Route exact path="/rsvp" element={<RSVP />}></Route>
+        {/* <Route exact path="/rsvp" element={<RSVP />}></Route> */}
         <Route exact path="/bridal-party" element={<BridalParty />}></Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

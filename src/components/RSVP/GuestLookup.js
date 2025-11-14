@@ -91,6 +91,9 @@ function GuestLookup({ guestList, setStep, setGuestSelected }) {
         <p style={{ textAlign: "center" }}>
           You will be able to RSVP for other members of your party as well.
         </p>
+        <p style={{ textAlign: "center" }}>
+          <strong>Enter "test" to explore RSVP function.</strong>
+        </p>
 
         <div
           style={{

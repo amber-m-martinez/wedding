@@ -254,5 +254,9 @@
   {
     "name": "Shanzay & Felix Fels",
     "guest_count": 2
+  },
+  {
+    "name": "Test Guest #1 & Test Guest #2",
+    "guest_count": 2
   }
 ]
